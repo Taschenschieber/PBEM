@@ -16,7 +16,7 @@ error404 = (req,res,next) -> res.render("404.jade")
 app.configure () ->
   app.locals.pretty = true # serve readable html files
   app.use express.cookieParser()
-  app.use express.bodyParser()
+  app.use express.bodyParser({uploadDir: "./uploads"})
   app.use express.session 
     secret: "fthagn"
   app.use auth.passport.initialize()

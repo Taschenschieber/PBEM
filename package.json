@@ -12,7 +12,8 @@
     "mongoose": "3.8.7",
     "crypto": "*",
     "connect-redis": "*",
-    "mysql": "*"
+    "mysql": "*",
+    "mkdirp": "*"
    },
   
   "devDependencies": {

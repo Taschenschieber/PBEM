@@ -1,4 +1,5 @@
 common = require "./common"
+mkdirp = require "mkdirp"
 database = common.database
 
 exports.setupRoutes = (app) ->
@@ -51,6 +52,21 @@ exports.setupRoutes = (app) ->
         game.save (err) ->
           return res.send err if err
           console.log log._id
+          path = __dirname + "/pub/logfiles/"+game._id+"/"+log._id+".vlog"
+          fs.readFile req.files.logfile.path, (err, data) ->
+            mkdirp.sync __dirname + "/pub/logfiles/"+game._id
+            fs.writeFile path, data, (err2) ->
+              if err || err2
+                # oh bollocks! Delete log from DB to ensure consistency
+                # well... eventual consistency
+                game.logs.splice(game.logs.indexOf(log), 1)
+                game.save (err) ->
+                  #do nothing
+                  console.log " "
+                return res.send err || err2
+              else
+                res.redirect "/game/" + game._id
+                # and done. TODO Add a notification here.
       
       
   #actual logic

@@ -1,14 +1,15 @@
 extend layout
 
 mixin logs(game)
-  p: a(href="/files/log/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log file
+  p: a(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log file
   p: a(href="/game/"+game._id+"/upload") Upload a new log file
   table.table
-    var i = 1
+    - var i = 1
     each log in game.logs
       tr
-        td= i++
-        td a(href="/files/log/"+game._id+"/"+log.id) Download
+        td= i
+        - i++
+        td: a(href="/logfiles/"+game._id+"/"+log.id) Download
 
 
 block secondary-nav
@@ -27,5 +28,5 @@ block content
       | This game has no logs so far. 
       a(href="/game/"+game._id+"/upload") Upload a log to start the game!
   else
-    +logs(game.logs)
+    +logs(game)
     
