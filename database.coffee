@@ -88,6 +88,6 @@ exports.findChallengesFor = (userName, done) ->
     .exec done
     
 exports.findChallengesFrom = (userName, done) ->
-  User.find {from: userName}
+  Challenge.find {from: userName}
     .sort "-date"
     .exec done

@@ -28,7 +28,29 @@ mixin incoming(challengers)
           p= challenger.message
 
 mixin outgoing(challenges)
-
+  each challenge in challenges
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title
+          Against
+          = challenge.to
+      .panel-body
+        ul
+          li 
+            b Scenario:  
+            = challenge.scenarioId || "DYO"
+          li
+            b Time Control: 
+            = challenge.timeControl
+          li
+            b Sent: 
+            = challenge.sent
+          li
+            a(href="/challenges/"+challenge.id+"/takeback") Take back 
+        if challenge.message
+          p The challenger sent you a message:
+          p= challenge.message
+        
 block secondary-nav
   include secondary-nav-games
   
@@ -42,3 +64,7 @@ block content
           | You do not have any open challenges! Maybe you would like to 
           a(href="/games/challenge") challenge someone yourself 
           | instead?
+          
+    if (challenges && challenges.length > 0)
+      h2 Your challenges
+      +outgoing(challenges)
