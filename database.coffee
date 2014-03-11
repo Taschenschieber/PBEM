@@ -8,6 +8,31 @@ db.once("open", () -> console.log("DB connection established."))
 
 mongoose.connect "mongodb://localhost/pbem"
 
+log = new mongoose.Schema
+  sentBy: Boolean # true = Player A, false = Player B
+  empty: Boolean # for these times when a player has no actions and 
+                 # btys immediately
+  filename: String # the physical filename in the game directory
+  date: # obvious
+    type: Date, default: Date.now
+  comment: String # a comment for the game
+  
+Log = mongoose.model "Log", log
+exports.Log = log
+
+game = new mongoose.Schema
+  playerA: String
+  playerB: String
+  kibitzers: [String] # list of usernames who watch the game
+  started:
+    type: Date, default: Date.now
+  timeControl: String
+  scenarioId: String # null if DYO
+  logs: [Log.schema]
+  
+Game = mongoose.model "Game", game
+exports.Game = Game
+
 challenge = new mongoose.Schema
   from: String # the user the challenge is issued to
   to: String # the user the challenge is issued to
