@@ -12,13 +12,12 @@ log = new mongoose.Schema
   sentBy: Boolean # true = Player A, false = Player B
   empty: Boolean # for these times when a player has no actions and 
                  # btys immediately
-  filename: String # the physical filename in the game directory
   date: # obvious
     type: Date, default: Date.now
   comment: String # a comment for the game
   
 Log = mongoose.model "Log", log
-exports.Log = log
+exports.Log = Log
 
 game = new mongoose.Schema
   playerA: String

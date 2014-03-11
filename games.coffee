@@ -17,6 +17,42 @@ exports.setupRoutes = (app) ->
         data.challenges = challenges || []
         res.render "challenges.jade", data
   
+  app.get "/games/my/active", (req,res) ->
+    data = assembleData req, res
+    database.Game.find {$or: [{playerA: req.user.name}, {playerB: req.user.name}]}, (err, games) ->
+      res.send err if (err)
+      
+      data.games = games
+      res.render "mygames.jade", data
+  
+  
+  
+  app.get "/game/:id", (req,res) ->
+    data = assembleData req,res
+    database.Game.findOne {_id: req.params.id}, (err, game) ->
+      res.send err if (err || !game)
+      data.game = game
+      res.render "game.jade", data
+      
+  app.get "/game/:id/upload", (req,res) ->
+    res.render "uploadLogfile.jade", assembleData(req, res)
+  
+  app.post "/game/:id/upload/do", (req,res) ->
+    # create database document in order to have an ID
+    log = new database.Log
+      sentBy: req.user.name
+      empty: false
+      
+    database.Game.findOne {_id: req.params.id}
+      .exec (err, game) ->
+        if err || not game
+          return res.send err
+        game.logs.push log
+        game.save (err) ->
+          return res.send err if err
+          console.log log._id
+      
+      
   #actual logic
   app.post "/do/games/challenge/issue", (req,res) -> 
     # validate stuff

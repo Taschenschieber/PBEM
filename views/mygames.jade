@@ -1,0 +1,21 @@
+extends layout.jade
+
+mixin list(games)
+  table.table
+    each game in games
+      tr
+        td= game.playerA
+        td= game.playerB
+        if game.scenarioId
+          td= game.scenarioId
+        else
+          td DYO
+        td: a(href="/game/"+game.id) Details...
+
+block secondary-nav
+  include secondary-nav-games
+  
+block content
+  h1 Your games
+  if games && games.length > 0
+    +list(games)

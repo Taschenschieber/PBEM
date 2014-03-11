@@ -1,0 +1,3 @@
+form(action="/game/"+req.params.gameId+"/upload/do", method="post", enctype="multipart/form-data")
+  input(type="file", name="logfile")
+  input(type="submit", value="Upload")

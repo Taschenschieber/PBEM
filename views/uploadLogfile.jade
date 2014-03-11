@@ -1,0 +1,9 @@
+extends layout
+
+block secondary-nav
+  include secondary-nav-games
+
+block content
+  form(action="/game/"+req.params.id+"/upload/do", method="post", enctype="multipart/form-data")
+    input(type="file", name="logfile")
+    input(type="submit", value="Upload")
