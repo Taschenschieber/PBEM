@@ -9,7 +9,7 @@ exports.setupRoutes = (app) ->
   app.get "/games/my/challenges", (req,res) ->
     data = assembleData req,res
     # load challenges from database
-    database.findChallengersFor req.user.name, (err, challengers) ->
+    database.findChallengesFor req.user.name, (err, challengers) ->
       return res.redirect "/error" if err
       data.challengers = challengers || []
       database.findChallengesFrom req.user.name, (err, challenges) ->
@@ -52,8 +52,9 @@ exports.setupRoutes = (app) ->
     #console.log challenge
     
     challenge.save (err) -> 
-      req.flash "error", "Could not write to database: " + err?.message?
-      return res.redirect "/error" 
+      if err
+        req.flash "error", "Could not write to database: " + err?.message
+        return res.redirect "/error"
 
       # saved the challenge - now, issue a notification to the challenged player
       database.createNotification challenge.to, "You have been challenged to a match!", "/games/my/challenges", (err) ->

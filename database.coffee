@@ -13,7 +13,7 @@ challenge = new mongoose.Schema
   to: String # the user the challenge is issued to
   sent: 
     type: Date, default: Date.now
-  timeControl: Number # the time control mode. Probably best to define some constants somewhere.
+  timeControl: String # the time control mode. Probably best to define some constants somewhere.
   scenarioId: String
   dyo: Boolean
   message: String

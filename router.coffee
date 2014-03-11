@@ -48,7 +48,7 @@ app.get "/notifications/:id", (req,res) ->
     return res.send err? || "Unknown error" if err || not notification?
     database.deleteNotification req.params.id, () ->
       return
-    res.redirect notification.action?  "/"
+    res.redirect notification?.action?  "/"
 
 app.listen(80)
 app.listen(8080)

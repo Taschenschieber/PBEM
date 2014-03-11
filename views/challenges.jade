@@ -2,9 +2,30 @@ extends layout
 
 mixin incoming(challengers)
   each challenger in challengers
-    h3 
-      Against
-      = challenger.username
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title
+          Against
+          = challenger.from
+      .panel-body
+        ul
+          li 
+            b Scenario:  
+            = challenger.scenario || "DYO"
+          li
+            b Time Control: 
+            = challenger.timeControl
+          li
+            b Sent: 
+            = challenger.sent
+          li
+            a(href="/challenges/"+challenger.id+"/accept") Accept 
+            | or 
+            a(href="/challenges/"+challenger.id+"/decline") Decline
+            | ?
+        if challenger.message
+          p The challenger sent you a message:
+          p= challenger.message
 
 mixin outgoing(challenges)
 
@@ -14,8 +35,8 @@ block secondary-nav
 block content
   h1 Challenges
     h2 People challenging you
-    if (res && res.challengers && res.challengers.length > 0)
-        +incoming(res.challengers)
+    if (challengers && challengers.length > 0)
+        +incoming(challengers)
     else
         p 
           | You do not have any open challenges! Maybe you would like to 
