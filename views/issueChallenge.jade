@@ -1,0 +1,48 @@
+extend layout
+
+block secondary-nav
+  include secondary-nav-games
+
+block content
+  h1 Issue a challenge
+  p This page allows you to issue a challenge to another user. The user can review the challenge and accept or decline it.
+  p Challenges can be taken back until they are accepted.
+  form(method="post", action="/do/games/challenge/issue")
+    table.table
+      tr
+        th Opponent
+        td: input(type="text", name="opponent")
+      tr
+        td(colspan=2) Please select your opponent here.
+      tr
+        th Time control
+        td: select(name="timecontrol")
+          option(value="none") None
+          option(value="48h") 48 hours per move
+          option(value="4d") 4 days per move
+          option(value="1m") 1 month per match
+          option(value="3m") 3 months per match
+          option(value="sand48h") 48 hours - hourglass
+      tr
+        td(colspan=2) 
+          | Select your time control mode here. Click 
+          a(href="#") here 
+          | if you'd like to read more about how the different modes work.
+      tr
+        th Scenario
+        td: input(type="text", name="scenario")
+      tr
+        td(colspan="2") Please enter the scenario ID (e. g. "S51") here. The name will automatically be added.
+      tr
+        th DYO / Custom scenario
+        td: input(type="checkbox", name="dyo")
+      tr
+        td(colspan="2") Check this if you want to play DYO or a custom scenario.
+        
+      tr
+        th Message
+        td: textarea(name="message")
+      tr
+        td(colspan="2") Add a message for your opponent.
+      tr
+        td(colspan="2"): input(type="submit",value="Issue Challenge")

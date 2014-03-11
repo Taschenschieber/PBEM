@@ -1,0 +1,9 @@
+extend layout
+
+block content
+  h1 Oops! That probably shouldn't have happened.
+  - var error = req.flash("error")
+  - if(error && (error != ""))
+    p= error
+  - else
+    p Unknown error

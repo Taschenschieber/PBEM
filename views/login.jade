@@ -1,0 +1,18 @@
+extend layout
+
+block content
+
+  .panel.panel-primary
+    .panel-heading: h3 Log in
+    .panel-body
+      p Please enter your credentials in order to log in.
+      form(method="post", action="/do/login")
+        table#login.table
+          tr
+            th User name
+            td: input(name="username",type="text")
+          tr
+            th Password
+            td: input(name="password",type="password")
+          tr
+            td(colspan=2): input(type="submit",value="Log in")

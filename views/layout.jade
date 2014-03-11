@@ -1,0 +1,65 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    title Some punny name
+    
+    link(href="http://localhost:8080/css/bootstrap.min.css", rel="stylesheet")
+    link(href="http://localhost:8080/css/styles.css", rel="stylesheet")
+  body(style="padding-top: 70px;")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
+    script(src="http://localhost:8080/js/bootstrap.min.js")
+    script(src="http://localhost:8080/js/coffee-script.js")
+    script(type="script/coffeescript", src="http://localhost:8080/js/client.coffee")
+    if req && req.user
+      .navbar.navbar-default.navbar-fixed-top(role="navigation")
+        .container-fluid
+          .navbar-header
+            button(type="button", class="navbar-toggle", data-toggle="collapse", data-target="navbar-collapse")
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href="#") PBEM
+          .collapse.navbar-collapse
+            ul.nav.navbar-nav
+              li: a(href="/") Home
+              li: a(href="/games") Games
+              li: a(href="/account") My Account
+              li: a(href="/help") Help
+              li.divider
+              include notifications
+            p.navbar-right.navbar-text Logged in as 
+              = req.user.name +" "
+              | (
+              a.navbar-link(href="/do/logout") Log out
+              |)
+    else
+       nav.navbar.navbar-default.navbar-fixed-top(role="navigation")
+        .container-fluid
+          .navbar-header
+              button(type="button", class="navbar-toggle", data-toggle="collapse", data-target="navbar-collapse")
+                span.sr-only Toggle navigation
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              a.navbar-brand(href="#") PBEM
+          .collapse.navbar-collapse
+            ul.nav.navbar-nav
+              li: a(href="/") Home
+              li: a(href="/help") Help
+            ul.nav.navbar-nav.navbar-right
+              li.navbar-right: a(href="/login") Log in
+              li.navbar-right: a(href="/signup") Sign up
+   
+    .container
+      include flashify
+      .col-xs-4
+        block secondary-nav
+          
+      .col-xs-8
+        block content
+   
+    #footer (c) 2014 Stephan Hillebrand

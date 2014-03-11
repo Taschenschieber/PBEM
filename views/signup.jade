@@ -1,0 +1,23 @@
+extend layout
+
+block content
+  .panel.panel-primary
+    .panel-heading: h3 Sign up
+    .panel-body
+      p With this form, you can create a new account.
+      form(method="post", action="/do/signup")
+        table.table
+          tr
+            th User name
+            td: input(type="text", name="username")
+          tr
+            th Password
+            td: input(type="password", name="password1")
+          tr
+            th Password (repeat)
+            td: input(type="password", name="password2")
+          tr
+            th E-Mail
+            td: input(type="text", name="email")
+          tr
+            td(colspan="2"): input(type="submit",value="Sign up")

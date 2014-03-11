@@ -1,0 +1,15 @@
+<!-- Flash block -->
+- var error = req.flash("error")
+if error && (error != "")
+  .alert.alert-danger
+    ul= error
+
+- var warning = req.flash("warning")
+if warning && (warning != "")
+  .alert.alert-warning
+    ul= warning
+    
+- var info = req.flash("info")
+if info && (info != "")
+  .alert.alert-info
+    ul= info
