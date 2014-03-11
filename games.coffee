@@ -14,7 +14,7 @@ exports.setupRoutes = (app) ->
       data.challengers = challengers || []
       database.findChallengesFrom req.user.name, (err, challenges) ->
         return res.redirect "/error" if err
-        data.challenges = challenges
+        data.challenges = challenges || []
         res.render "challenges.jade", data
   
   #actual logic
@@ -49,25 +49,18 @@ exports.setupRoutes = (app) ->
       message: req.body.message
     }
     
-    console.log challenge
-      
-    # write to this user's account
-    database.getUserByName challenge.from, (err, user) -> 
-      if err || not user
-        req.flash "error", "Could not read from database: " + err?.message?
-        return res.redirect "/error"
-      else
-        user.challenges.push challenge
-        user.save (err) ->
-          if err
-            req.flash "error", "Could not write to database: " + err?.message?
-            return res.redirect "/error" 
-          # saved the challenge - now, issue a notification to the challenged player
-          database.createNotification challenge.to, "You have been challenged to a match!", "/games/my/challenges", (err) ->
-            console.log(err || "Notification created")
-            # all done... hopefully. Worry about asynchronous err handling later.
-            # no error handling for notifications, it's not really worth it.
-          res.redirect("/games/challenge/success")
+    #console.log challenge
+    
+    challenge.save (err) -> 
+      req.flash "error", "Could not write to database: " + err?.message?
+      return res.redirect "/error" 
+
+      # saved the challenge - now, issue a notification to the challenged player
+      database.createNotification challenge.to, "You have been challenged to a match!", "/games/my/challenges", (err) ->
+        console.log(err || "Notification created")
+        # all done... hopefully. Worry about asynchronous err handling later.
+        # no error handling for notifications, it's not really worth it.
+      res.redirect("/games/challenge/success")
   
 assembleData = (req,res) ->
   # assemble a bunch of data that pages can do stuff with
