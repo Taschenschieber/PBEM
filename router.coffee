@@ -45,10 +45,13 @@ games.setupRoutes app
 # notifications
 app.get "/notifications/:id", (req,res) ->
   database.getNotification req.params.id, (err, notification) ->
-    return res.send err? || "Unknown error" if err || not notification?
+    if err || not notification?
+      return res.send err || "Unknown error"
+    action = notification.action || "/" # so it is accessible after deletion
+
     database.deleteNotification req.params.id, () ->
       return
-    res.redirect notification?.action?  "/"
+    res.redirect action
 
 app.listen(80)
 app.listen(8080)
