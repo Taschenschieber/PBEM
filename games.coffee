@@ -63,6 +63,43 @@ exports.setupRoutes = (app) ->
         # no error handling for notifications, it's not really worth it.
       res.redirect("/games/challenge/success")
   
+  app.get "/challenges/:id/accept", (req, res) -> # TODO Authenticate!
+    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
+      res.render err if (err || not res)
+      # create a game out of the challenge
+      game = new database.Game
+        playerA: challenge.from
+        playerB: challenge.to
+        timeControl: challenge.timeControl
+        scenarioId: challenge.scenarioId
+      
+      game.save (err) ->
+        res.send err if err
+        # send notification
+        database.createNotification challenge.to, req.user.name + " accepted your challenge!", "/game/"+game._id, (err) ->
+          console.log err if err
+        res.redirect "/game/" + game._id
+       
+
+  app.get "/challenges/:id/decline", (req,res) -> # TODO Authenticate
+    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
+      res.render err if (err || not res)
+      database.createNotification challenge.from, req.user.name + " declined your challenge. :(", "#", (err) ->
+        console.log err if err
+      challenge.remove (err) ->
+        return res.render err if err
+        res.redirect "/games/my/challenges"
+        
+  app.get "/challenges/:id/takeback", (req,res) -> # TODO Authenticate
+    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
+      res.render err if (err || not res)
+      database.createNotification challenge.to, req.user.name + " took back his challenge to you.", "#", (err) ->
+        console.log err if err
+      challenge.remove (err) ->
+        return res.render err if err
+        res.redirect "/games/my/challenges"
+
+  
 assembleData = (req,res) ->
   # assemble a bunch of data that pages can do stuff with
   {req: req, res: res}
