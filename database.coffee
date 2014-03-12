@@ -27,6 +27,11 @@ game = new mongoose.Schema
     type: Date, default: Date.now
   timeControl: String
   scenarioId: String # null if DYO
+  active:
+    type: Boolean, default: true # set to false once completed / aborted
+  result:
+    type: String
+    default: "ongoing"
   logs: [Log.schema]
   
 Game = mongoose.model "Game", game

@@ -82,6 +82,18 @@ exports.setupRoutes = (app) ->
                   # and done. TODO Add a notification here.
                   # TODO Add e-mail sending here
       
+  app.get "/games/world/active/:page", (req,res) ->
+    data = assembleData req, res
+    database.Game.find {active: true}
+         #.sort "-started"
+         #.skip (req.params.page-1)*10
+         #.limit 10
+         .exec (err, games) ->
+            return res.send err if err
+            data.games = games
+            console.log games
+            res.render "allGames.jade", data
+      
       
   #actual logic
   app.post "/do/games/challenge/issue", (req,res) -> 
