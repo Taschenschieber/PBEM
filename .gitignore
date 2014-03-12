@@ -220,4 +220,4 @@ node_modules
 *.log
 uploads/
 *.vlog
-pub/logfiles
+pub/logfiles/
