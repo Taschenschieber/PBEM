@@ -1,5 +1,6 @@
 common = require "./common"
 mkdirp = require "mkdirp"
+fs = require "fs"
 database = common.database
 
 exports.setupRoutes = (app) ->
@@ -53,20 +54,33 @@ exports.setupRoutes = (app) ->
           return res.send err if err
           console.log log._id
           path = __dirname + "/pub/logfiles/"+game._id+"/"+log._id+".vlog"
+          console.log "Saving to: ", path
+          console.log "Tempfile: ", req.files.logfile.path
           fs.readFile req.files.logfile.path, (err, data) ->
-            mkdirp.sync __dirname + "/pub/logfiles/"+game._id
-            fs.writeFile path, data, (err2) ->
-              if err || err2
+            return res.send err if err
+            console.log "Making dir: ", __dirname + "/pub/logfiles/"+game._id
+            mkdirp __dirname + "/pub/logfiles/"+game._id, (err) ->
+              if err
                 # oh bollocks! Delete log from DB to ensure consistency
                 # well... eventual consistency
                 game.logs.splice(game.logs.indexOf(log), 1)
                 game.save (err) ->
                   #do nothing
                   console.log " "
-                return res.send err || err2
-              else
-                res.redirect "/game/" + game._id
-                # and done. TODO Add a notification here.
+                return res.send err
+              fs.writeFile path, data, (err2) ->
+                if err2
+                  # oh bollocks! Delete log from DB to ensure consistency
+                  # well... eventual consistency
+                  game.logs.splice(game.logs.indexOf(log), 1)
+                  game.save (err) ->
+                    #do nothing
+                    console.log " "
+                  return res.send err2
+                else
+                  res.redirect "/game/" + game._id
+                  # and done. TODO Add a notification here.
+                  # TODO Add e-mail sending here
       
       
   #actual logic
