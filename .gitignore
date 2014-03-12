@@ -219,3 +219,5 @@ node_modules
 /*.js
 *.log
 uploads/
+*.vlog
+pub/logfiles
