@@ -4,7 +4,7 @@
   "dependencies": {
     "jade": "1.1.5",
     "express": "3.4.8",
-    "flashify": "*",
+    "connect-flash": "*",
     "passport": "0.2.0",
     "passport-local": "0.1.6",
     "passport-google": "0.3.0",

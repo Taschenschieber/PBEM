@@ -53,9 +53,8 @@ app.get "/notifications/:id", (req,res) ->
       return
     res.redirect action
 
-app.listen(80)
 app.listen(8080)
-console.log "Server listening at 80+8080"
+console.log "Server listening at 8080"
 
 assembleData = (req,res) ->
   # assemble a bunch of data that pages can do stuff with
