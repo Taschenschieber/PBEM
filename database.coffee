@@ -61,10 +61,23 @@ Notification = mongoose.model "Notification", notificationSchema
 
 userSchema = new mongoose.Schema
   name: String
-  password: String,
+  password: String
   email: String
-  #challenges: [Challenge.schema]
-
+  activated: # was the e-mail confirmed yet?
+    type: Boolean
+    default: false
+  banned:
+    type: Boolean
+    default: false
+  notifications:
+    onNewLog:
+      type: Boolean, default: false
+    onNewLogWithLog:
+      type: Boolean, default: false
+    onChallenge:
+      type: Boolean, default: false
+  
+  
 # encryption 
 
 userSchema.pre "save", (next) ->
