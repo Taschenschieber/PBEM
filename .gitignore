@@ -221,3 +221,4 @@ node_modules
 uploads/
 *.vlog
 pub/logfiles/
+config.*

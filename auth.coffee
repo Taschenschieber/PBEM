@@ -1,4 +1,5 @@
 common = require "./common"
+email = require "./email"
 
 exports.passport = require "passport"
 passport = exports.passport
@@ -13,14 +14,14 @@ passport.use new LocalStrategy (username, password, done) ->
   User.findOne {name: username}, (err, user) ->
     return done err if err
     if not user?
-      return done null, false, "Invalid credentials."
+      return done null, false, "Invalid credentials!"
     user.comparePassword password, (err, valid) ->
       if err
-        return done err, false, err
+        return done err, false, err.message
       if valid
         return done null, user
       else
-        return done null, false, "Invalid credentials."
+        return done err, false, err.message
 
 exports.setupRoutes = (app) ->       
   app.post "/do/login", passport.authenticate("local", {successRedirect: "/games", failureRedirect: "/login", failureFlash: true})
@@ -70,6 +71,11 @@ exports.setupRoutes = (app) ->
           res.redirect "/error"
         else
           res.redirect "/"
+        # send confirmation mail
+      email.sendConfirmationMail user, (err, res) ->
+        console.log err if err
+        console.log "Validation mail sent: ", res if res
+      
           
 passport.serializeUser (user,done) -> 
   done null, user.name

@@ -63,6 +63,9 @@ userSchema = new mongoose.Schema
   name: String
   password: String
   email: String
+  validationToken: 
+    type: String
+    default: crypto.randomBytes(32).toString "hex"
   activated: # was the e-mail confirmed yet?
     type: Boolean
     default: false
@@ -81,16 +84,21 @@ userSchema = new mongoose.Schema
 # encryption 
 
 userSchema.pre "save", (next) ->
-  user = this;
+  user = this;  
   
   next() if not user.isModified "password"
   
   user.password = crypto.createHash("sha256").update(user.password).digest("base64")
   next()
       
+# besides offering password validation, this does a couple of other checks as well.
 userSchema.methods.comparePassword = (candidatePassword, cb) ->
+  if user.banned
+    return cb(new Error("You are banned!"), false)
+  if not user.active
+    return cb(new Error("Please validate your e-mail before your first log-in."), false)
   if crypto.createHash("sha256").update(candidatePassword).digest("base64") is this.password
-    cb null, true
+    cb new Error("Invalid credentials!"), true
   else
     cb null, false
 
