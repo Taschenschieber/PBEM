@@ -93,12 +93,8 @@ userSchema.pre "save", (next) ->
       
 # besides offering password validation, this does a couple of other checks as well.
 userSchema.methods.comparePassword = (candidatePassword, cb) ->
-  if user.banned
-    return cb(new Error("You are banned!"), false)
-  if not user.active
-    return cb(new Error("Please validate your e-mail before your first log-in."), false)
   if crypto.createHash("sha256").update(candidatePassword).digest("base64") is this.password
-    cb new Error("Invalid credentials!"), true
+    cb null, true
   else
     cb null, false
 

@@ -19,15 +19,33 @@ passport.use new LocalStrategy (username, password, done) ->
       if err
         return done err, false, err.message
       if valid
+        if user.banned
+          return done null, false, "You are banned!"
+        if not user.activated
+          return done null, false, "Please follow the instructions you
+          received by e-mail before logging in for the first time. We need to make sure the e-mail address you are using actually belongs to you."
         return done null, user
       else
-        return done err, false, err.message
+        return done null, false, "Invalid credentials!"
 
 exports.setupRoutes = (app) ->       
   app.post "/do/login", passport.authenticate("local", {successRedirect: "/games", failureRedirect: "/login", failureFlash: true})
   app.get "/do/logout", (req,res) -> 
     req.logout()
     res.redirect("/")
+  app.get "/validate/:userid/:token", (req,res) ->
+    database.User.findOne
+      _id: req.params.userid
+      validationToken: req.params.token
+    , (err, user) ->
+      return res.send err if err
+      return res.send "Invalid user or token" if not user
+      user.activated = true
+      user.save (err) ->
+        return res.send err if err
+        return res.redirect "/login"
+        # TODO Make error handling more fancy!
+ 
   app.post "/do/signup", (req,res) -> 
     failed = no
     # validate data
