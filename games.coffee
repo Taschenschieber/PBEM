@@ -63,7 +63,8 @@ exports.setupRoutes = (app) ->
               if err
                 # oh bollocks! Delete log from DB to ensure consistency
                 # well... eventual consistency
-                game.logs.splice(game.logs.indexOf(log), 1)
+                if game.logs.indexOf log >= 0
+                  game.logs.splice(game.logs.indexOf(log), 1)
                 game.save (err) ->
                   #do nothing
                   console.log " "
