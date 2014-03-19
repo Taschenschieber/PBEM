@@ -1,7 +1,17 @@
 flash = require "connect-flash"
 express = require "express"
+
+redis = require "redis"
+RedisStore = require("connect-redis")(express)
+store = new RedisStore
+
 common = require "./common"
 notifications = require "./notification-loader"
+config = require "./config"
+
+
+
+
 app = express()
 
 database = common.database
@@ -14,21 +24,29 @@ error = (err,req,res,next) -> res.send("ERROR: ", err, "STACKTRACE: ", err.stack
 error404 = (req,res,next) -> res.render("404.jade")
   
 app.configure () ->
+  # static files go first
+  app.use express.static __dirname + "/pub"
+  
+  # middleware settings now
   app.locals.pretty = true # serve readable html files
+  
+  # middleware that does not require authentication
   app.use express.cookieParser()
-  app.use express.bodyParser({uploadDir: "./uploads"})
+  app.use express.bodyParser
+    uploadDir: "./uploads"
   app.use express.session 
-    secret: "fthagn"
+    secret: config.session.secret
+    store: new RedisStore
+  app.use flash()
+    
+  # authentication
   app.use auth.passport.initialize()
   app.use auth.passport.session()
-  app.use notifications.populate # needs to be called after Passport
-  app.use flash()
-  app.use app.router
-  app.use express.static __dirname + "/pub"
-  #app.use error
-  #app.use error404
   
-
+  # middleware that requires authentication
+  app.use notifications.populate
+  app.use app.router
+  
 
 # static routes
 app.get "/", (req,res) -> res.render("index.jade", assembleData(req,res))
