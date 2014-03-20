@@ -47,7 +47,9 @@ app.configure () ->
   app.use flash()
   app.use app.router
   
-  # NOTE: For some weird reason, notifications.populate fails when called last.
+  # NOTE: For some weird reason, notifications.populate fails when called 
+  # immediately before app.router.
+  # For the time being, flash() should be called between the two.
   
 
 # static routes

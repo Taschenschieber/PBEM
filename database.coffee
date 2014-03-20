@@ -9,7 +9,7 @@ db.once("open", () -> console.log("DB connection established."))
 mongoose.connect "mongodb://localhost/pbem"
 
 log = new mongoose.Schema
-  sentBy: Boolean # true = Player A, false = Player B
+  sentBy: String # the player who sent the log
   empty: Boolean # for these times when a player has no actions and 
                  # btys immediately
   date: # obvious

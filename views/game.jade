@@ -2,7 +2,6 @@ extend layout
 
 mixin logs(game)
   p: a(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log file
-  p: a(href="/game/"+game._id+"/upload") Upload a new log file
   table.table
     - var i = 1
     each log in game.logs
@@ -28,5 +27,26 @@ block content
       | This game has no logs so far. 
       a(href="/game/"+game._id+"/upload") Upload a log to start the game!
   else
+    if req && req.user
+      if (activePlayer == req.user.name)
+        p 
+          | It is your turn to move. 
+          a(href="/game/"+game._id+"/upload") Upload your next log now?
+      else if(activePlayer == "")
+        p
+          | Invalid data. The software can not determine whose turn it is. If it is your turn, 
+          a(href="/game/"+game._id+"/upload") click here
+          | &nbsp;to continue the game.  
+      else
+        p
+          | It is 
+          a(href="/user/"+activePlayer)= activePlayer
+          | 's turn to move.
+    else      
+      p
+        | It is
+        a(href="/user/"+activePlayer)= activePlayer
+        | 's turn to move.
+          
     +logs(game)
     
