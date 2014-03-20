@@ -8,6 +8,7 @@ store = new RedisStore
 common = require "./common"
 notifications = require "./notification-loader"
 config = require "./config"
+user = require "./user"
 
 
 
@@ -63,6 +64,7 @@ app.get "/error", (req,res) -> res.render("error.jade", assembleData(req,res))
 # Login handler
 auth.setupRoutes app
 games.setupRoutes app
+user.setupRoutes app
 
 # notifications
 app.get "/notifications/:id", (req,res) ->

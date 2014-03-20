@@ -15,7 +15,8 @@
     "connect-redis": "1.4.7",
     "mysql": "*",
     "mkdirp": "*",
-    "nodemailer": "*"
+    "nodemailer": "*",
+    "gravatar": "*"
    },
   
   "devDependencies": {
