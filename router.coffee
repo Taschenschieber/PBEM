@@ -27,7 +27,7 @@ app.configure () ->
   # static files go first
   app.use express.static __dirname + "/pub"
   
-  # middleware settings now
+  # middleware settings
   app.locals.pretty = true # serve readable html files
   
   # middleware that does not require authentication
@@ -37,7 +37,6 @@ app.configure () ->
   app.use express.session 
     secret: config.session.secret
     store: new RedisStore
-  app.use flash()
     
   # authentication
   app.use auth.passport.initialize()
@@ -45,7 +44,10 @@ app.configure () ->
   
   # middleware that requires authentication
   app.use notifications.populate
+  app.use flash()
   app.use app.router
+  
+  # NOTE: For some weird reason, notifications.populate fails when called last.
   
 
 # static routes

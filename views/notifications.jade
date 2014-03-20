@@ -3,13 +3,13 @@ mixin notifications(notifications)
     - each notification in notifications
       li: a(href="/notifications/" + notification._id)= notification.text
 
-if(req.user && req.user.notifications && req.user.notifications.length)
+if(req.notifications && req.notifications.length)
   li
     a.dropdown-toggle(href="#", data-toggle="dropdown")
       | Notifications 
       span.badge
-        = req.user.notifications.length
-      +notifications(req.user.notifications)
+        = req.notifications.length
+      +notifications(req.notifications)
   
 else
   li
