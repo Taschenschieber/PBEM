@@ -1,3 +1,9 @@
+mixin entry(title, url)
+  if req.path == url
+    li.active: a(href=url)= title
+  else
+    li: a(href=url)= title
+
 doctype html
 html
   head
@@ -25,10 +31,9 @@ html
             a.navbar-brand(href="#") PBEM
           .collapse.navbar-collapse
             ul.nav.navbar-nav
-              li: a(href="/") Home
-              li: a(href="/games") Games
-              li: a(href="/account") My Account
-              li: a(href="/help") Help
+              +entry("Games", "/games")
+              +entry("Community", "/users")
+              +entry("Help", "/help")
               li.divider
               include notifications
             p.navbar-right.navbar-text Logged in as 
@@ -48,8 +53,8 @@ html
               a.navbar-brand(href="#") PBEM
           .collapse.navbar-collapse
             ul.nav.navbar-nav
-              li: a(href="/") Home
-              li: a(href="/help") Help
+              +entry("Home", "/")
+              +entry("Help", "/help")
             ul.nav.navbar-nav.navbar-right
               li.navbar-right: a(href="/login") Log in
               li.navbar-right: a(href="/signup") Sign up
