@@ -52,9 +52,9 @@ exports.setupRoutes = (app) ->
       , (err, users) ->
         for user in users
           if user.name == game.playerA
-            data.avatarA = gravatar.url user.email, {}
+            data.avatarA = gravatar.url user.email, {d: "identicon"}
           else
-            data.avatarB = gravatar.url user.email, {}
+            data.avatarB = gravatar.url user.email, {d: "identicon"}
           
         data.avatarA = 
         res.render "game.jade", data

@@ -1,0 +1,23 @@
+extends ../layout
+
+block secondary-nav
+  include secondary-nav-users
+  
+block content
+  h1= user.name
+  if user.banned
+    p Banned
+  else if !user.activated
+    p Inactive
+  else
+    table.game-header(width="100%")
+      tr
+        td(rowspan="3", width="80px"): img(src=avatar,float=left,alt=user.name+"'s Avatar")
+        th Standard User
+      tr
+        td: a(href="/messages/send?to="+user.name) Send a message
+      tr
+        td: a(href="/games/challenge?to="+user.name) Challenge this User
+        
+
+    //- TODO Add admin etc status
