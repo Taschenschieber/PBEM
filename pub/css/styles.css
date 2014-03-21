@@ -11,3 +11,12 @@ table.game-header th, table.game-header td {
 td.active-player {
   color: red;
 }
+
+#logs-table td {
+  padding: 2px;
+  text-align: center
+}
+
+#logs-table tr#bottom td {
+  border-bottom: 2px dotted silver;
+}

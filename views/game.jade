@@ -2,13 +2,35 @@ extend layout
 
 mixin logs(game)
   p: a(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log file
-  table.table
-    - var i = 1
-    each log in game.logs
+  table#logs-table
+    - for(var i = game.logs.length-1; i != 0; i--)
+      if game.logs[i].empty
+        tr
+          th(colspan=20) No actions taken
       tr
-        td= i
-        - i++
-        td: a(href="/logfiles/"+game._id+"/"+log.id) Download
+        th(colspan=20)
+          a(href="/logfiles/"+game._id+"/"+game.logs[i].id)
+            span.glyphicon.glyphicon-floppy-save 
+          | &nbsp;Log #
+          = i
+
+      tr
+        td
+          if(game.logs[i].sentBy == game.playerA)
+            img(src=avatarAsmall)
+          else if(game.logs[i].sentBy == game.playerB)
+            img(src=avatarBsmall)
+        td(width="*")
+          | Submitted by 
+          = game.logs[i].sentBy
+          | , 
+          = game.logs[i].prettyDate || game.logs[i].date
+      tr#bottom
+        td(colspan=20)
+          if game.message
+            p= game.message
+          else
+            p: i No message was sent with this log file.
 
 
 block secondary-nav
@@ -62,14 +84,17 @@ block content
         td
       else if(game.whoseTurn == "B")
         td
-        td.alert Active Player
+        td.active-player Active Player
       else
         td
         td
+        
+        
   if game.logs.length == 0
     p 
       | This game has no logs so far. 
       a(href="/game/"+game._id+"/upload") Upload a log to start the game!
+  
   else
     if req && req.user
       if (activePlayer == req.user.name)

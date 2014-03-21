@@ -16,7 +16,8 @@
     "mysql": "*",
     "mkdirp": "*",
     "nodemailer": "*",
-    "gravatar": "*"
+    "gravatar": "*",
+    "moment": "*"
    },
   
   "devDependencies": {

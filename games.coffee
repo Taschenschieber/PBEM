@@ -1,6 +1,8 @@
 common = require "./common"
 mkdirp = require "mkdirp"
 fs = require "fs"
+moment = require "moment"
+
 error = require "./error"
 
 gravatar = require "gravatar"
@@ -44,7 +46,14 @@ exports.setupRoutes = (app) ->
       else
         data.activePlayer = ""
       
+      
+      # do some date formatting
+      i = 0
+      for log in game.logs
+        log.prettyDate = moment(log.date).fromNow()
+        
       data.game = game
+
       # get player profiles
       database.User.find
         $or: [{name: game.playerB}, {name: game.playerA}]
@@ -52,8 +61,11 @@ exports.setupRoutes = (app) ->
         for user in users
           if user.name == game.playerA
             data.avatarA = gravatar.url user.email, {d: "identicon"}
+            data.avatarAsmall = gravatar.url user.email, {d: "identicon", s:32}
           else
             data.avatarB = gravatar.url user.email, {d: "identicon"}
+            data.avatarBsmall = gravatar.url user.email, {d: "identicon", s:32}
+
         # get scenario information, if available
         database.Scenario.findOne
           number: game.scenarioId
