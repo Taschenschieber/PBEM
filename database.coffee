@@ -100,7 +100,7 @@ notificationSchema = new mongoose.Schema
   date: 
     type: Date, default: Date.now
   
-Notification = mongoose.model "Notification", notificationSchema
+exports.Notification = Notification = mongoose.model "Notification", notificationSchema
 
 userSchema = new mongoose.Schema
   name: String

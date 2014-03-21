@@ -65,17 +65,7 @@ app.get "/error", (req,res) -> res.render("error.jade", assembleData(req,res))
 auth.setupRoutes app
 games.setupRoutes app
 user.setupRoutes app
-
-# notifications
-app.get "/notifications/:id", (req,res) ->
-  database.getNotification req.params.id, (err, notification) ->
-    if err || not notification?
-      return res.send err || "Unknown error"
-    action = notification.action || "/" # so it is accessible after deletion
-
-    database.deleteNotification req.params.id, () ->
-      return
-    res.redirect action
+notifications.setupRoutes app
 
 app.listen(8080)
 console.log "Server listening at 8080"
