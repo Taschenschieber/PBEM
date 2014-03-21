@@ -51,6 +51,8 @@ exports.setupRoutes = (app) ->
       i = 0
       for log in game.logs
         log.prettyDate = moment(log.date).fromNow()
+        log.prettyFirstPhase = getPhaseByID log.firstPhase
+        log.prettyLastPhase = getPhaseByID log.lastPhase
         
       data.game = game
 
@@ -83,7 +85,10 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false
+      empty: false 
+      message: req.body.message
+      firstPhase: req.body.firstPhase
+      lastPhase: req.body.lastPhase
     
     
     database.Game.findOne {_id: req.params.id}
@@ -239,3 +244,36 @@ exports.setupRoutes = (app) ->
 assembleData = (req,res) ->
   # assemble a bunch of data that pages can do stuff with
   {req: req, res: res}
+  
+  
+getPhaseByID = (id) ->
+  switch id
+    when 1  
+      a = "RPh"
+      b = "blue"
+    when 2  
+      a = "PFPh"
+      b = "orange"
+    when 3 
+      a = "MPh"
+      b = "green"
+    when 4 
+      a = "DFPh"
+      b = "violet"
+    when 5 
+      a = "AFPh"
+      b = "violet"
+    when 6 
+      a = "RtPh"
+      b = "black"
+    when 7  
+      a = "APh"
+      b = "black"
+    when 8  
+      a = "CCPh"
+      b = "red"
+    else
+      a = "???"
+      b = "black"
+      
+  return "<span style='color:"+b+"; font-weight: bold;'>"+a+"</span>"

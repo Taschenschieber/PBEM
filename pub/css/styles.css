@@ -14,7 +14,15 @@ td.active-player {
 
 #logs-table td {
   padding: 2px;
-  text-align: center
+  text-align: center;
+}
+
+#logs-table td#message {
+  text-align: left;
+}
+
+#logs-table {
+  width: 100%
 }
 
 #logs-table tr#bottom td {

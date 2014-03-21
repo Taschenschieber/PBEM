@@ -4,6 +4,40 @@ block secondary-nav
   include secondary-nav-games
 
 block content
-  form(action="/game/"+req.params.id+"/upload/do", method="post", enctype="multipart/form-data")
-    input(type="file", name="logfile")
-    input(type="submit", value="Upload")
+  h1 Upload new log file
+  
+  form(action="/game/"+req.params.id+"/upload/do", method="post", enctype="multipart/form-data", role="form")
+    .form-group
+      label Select File
+      input.form-control(type="file", name="logfile")
+      
+    .form-group
+      label Message
+      textarea.form-control(name="message")
+      
+    .form-group
+      label First Phase
+      select.form-control(name="firstPhase")
+        option(value="1") RPh
+        option(value="2") PFPh
+        option(value="3") MPh
+        option(value="4") DFPh
+        option(value="5") AFPh
+        option(value="6") RtPh
+        option(value="7") APh
+        option(value="8") CCPh
+        
+    .form-group
+      label Last Phase
+      select.form-control(name="lastPhase")
+        option(value="1") RPh
+        option(value="2") PFPh
+        option(value="3") MPh
+        option(value="4") DFPh
+        option(value="5") AFPh
+        option(value="6") RtPh
+        option(value="7") APh
+        option(value="8") CCPh
+      
+      
+    button.btn.btn-primary(type="submit") Upload

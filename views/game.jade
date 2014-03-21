@@ -20,15 +20,20 @@ mixin logs(game)
             img(src=avatarAsmall)
           else if(game.logs[i].sentBy == game.playerB)
             img(src=avatarBsmall)
-        td(width="*")
+        td
           | Submitted by 
           = game.logs[i].sentBy
           | , 
           = game.logs[i].prettyDate || game.logs[i].date
+        td
+          | Covers&nbsp;
+          != game.logs[i].prettyFirstPhase
+          | &nbsp;through&nbsp;
+          != game.logs[i].prettyLastPhase
       tr#bottom
-        td(colspan=20)
-          if game.message
-            p= game.message
+        td(colspan=20)#message
+          if game.logs[i].message
+            p= game.logs[i].message
           else
             p: i No message was sent with this log file.
 

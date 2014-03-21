@@ -49,7 +49,16 @@ log = new mongoose.Schema
                  # btys immediately
   date: # obvious
     type: Date, default: Date.now
-  comment: String # a comment for the game
+  message: String # a comment for the game
+  
+  firstPhase: # 1 is RPh, 8 is CCPh
+    type: Number
+    default: 0
+    
+  lastPhase: # 1 is RPh, 8 is CCPh
+    type: Number
+    default: 0
+    
   
 Log = mongoose.model "Log", log
 exports.Log = Log
