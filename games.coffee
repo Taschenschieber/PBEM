@@ -37,14 +37,12 @@ exports.setupRoutes = (app) ->
     database.Game.findOne {_id: req.params.id}, (err, game) ->
       res.send err if (err || !game)
       # find out whose turn it is
-      if game.logs.length > 0
-        log = game.logs[game.logs.length-1]
-        if log.sentBy == game.playerA
-          data.activePlayer = game.playerB
-        else if log.sentBy == game.playerB
-          data.activePlayer = game.playerA
-        else
-          data.activePlayer = ""
+      if game.whoseTurn == "A"
+        data.activePlayer = game.playerA
+      else if game.whoseTurn == "B"
+        data.activePlayer = game.playerB
+      else
+        data.activePlayer = ""
       
       data.game = game
       # get player profiles

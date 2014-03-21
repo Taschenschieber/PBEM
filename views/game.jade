@@ -55,15 +55,17 @@ block content
       tr
         td ???
         td ???
-    //- TODO Replace mockup by actual logic
+
     tr
-      if(activePlayer == game.playerA)
+      if(game.whoseTurn == "A")
         td.active-player Active Player
         td
-      else
+      else if(game.whoseTurn == "B")
         td
         td.alert Active Player
-      
+      else
+        td
+        td
   if game.logs.length == 0
     p 
       | This game has no logs so far. 
