@@ -25,7 +25,7 @@ exports.populate = (req, res, next) ->
             to: name
           , (err2, number2) ->
             console.log err2 if err2
-            req.bullets.challenges = number || 0
+            req.bullets.challenges = number2 || 0
             
 
             next()
