@@ -80,7 +80,18 @@ exports.setupRoutes = (app) ->
       .exec (err, game) ->
         if err || not game
           return res.send err
+         
+        # ensure the current user is allowed to upload to this match
+        unless(req?.user?.name? and (req.user.name == game.playerA || req.user.name == game.playerB))
+          return error.handle(new Error("You are not allowed to post logs to this game."))
+          
         game.logs.push log
+        previousPlayer = game.whoseTurn || "" # needed to revert after error
+        if(req.user.name == game.playerA)
+          game.whoseTurn = "B"
+        else
+          game.whoseTurn = "A"
+        
         game.save (err) ->
           return res.send err if err
           console.log log._id
@@ -96,6 +107,8 @@ exports.setupRoutes = (app) ->
                 # well... eventual consistency
                 if game.logs.indexOf log >= 0
                   game.logs.splice(game.logs.indexOf(log), 1)
+                  
+                game.whoseTurn = previousPlayer
                 game.save (err) ->
                   #do nothing
                   console.log " "
@@ -104,7 +117,10 @@ exports.setupRoutes = (app) ->
                 if err2
                   # oh bollocks! Delete log from DB to ensure consistency
                   # well... eventual consistency
-                  game.logs.splice(game.logs.indexOf(log), 1)
+                  if game.logs.indexOf log >= 0
+                    game.logs.splice(game.logs.indexOf(log), 1)
+                    
+                  game.whoseTurn = previousPlayer
                   game.save (err) ->
                     #do nothing
                     console.log " "

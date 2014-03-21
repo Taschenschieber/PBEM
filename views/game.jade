@@ -26,12 +26,35 @@ block content
       th(width="*"): a(href="/user/"+game.playerA)= game.playerA
       th(width="*"): a(href="/user/"+game.playerB)= game.playerB
       td(width="80px" rowspan="4"): img(src=avatarB)
-    tr
-      td Scenario Defender
-      td Scenario Attacker
-    tr
-      td Germany
-      td USA
+    if game.whoIsAttacker == "A" 
+      tr
+        td Scenario Attacker
+        td Scenario Defender
+      tr
+        if (scenario && scenario.defender && scenario.attacker)
+          td= scenario.defender.nation
+          td= scenario.attacker.nation
+        else
+          td ???
+          td ???
+    else if game.whoIsAttacker == "B"
+      tr
+        td Scenario Defender
+        td Scenario Attacker
+      tr
+        if (scenario && scenario.defender && scenario.attacker)
+          td= scenario.defender.nation
+          td= scenario.attacker.nation
+        else
+          td ???
+          td ???
+    else
+      tr
+        td ???
+        td ???
+      tr
+        td ???
+        td ???
     //- TODO Replace mockup by actual logic
     tr
       if(activePlayer == game.playerA)

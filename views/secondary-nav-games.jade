@@ -1,8 +1,17 @@
 ul.nav.nav-pills.nav-stacked
-  li: a(href="/games/my/active") My matches
-  li: a(href="/games/my/archive") My history
-  li: a(href="/games/my/challenges") Challenges
-  li: a(href="/games/world/active/1") Kibitz
-  li: a(href="/games/world/archive") Archive
+  li
+    a(href="/games/my/active")
+      if req && req.bullets && req.bullets.games
+        span.badge.pull-right= req.bullets.games
+       My Games
+
+  li: a(href="/games/my/archive") My Archive
+  li
+    a(href="/games/my/challenges") My Challenges
+      if req && req.bullets && req.bullets.challenges
+        span.badge.pull-right= req.bullets.challenges
+
+  li: a(href="/games/world/active/1") Ongoing Games
+  li: a(href="/games/world/archive") Archived Games
   li: a(href="/games/challenge") Challenge somebody
   li: a(href="/games/find") Find opponent

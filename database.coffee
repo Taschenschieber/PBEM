@@ -68,6 +68,14 @@ game = new mongoose.Schema
     type: String
     default: "ongoing"
   logs: [Log.schema]
+  whoseTurn: 
+    type: String
+    enum: ["A", "B", ""]
+    default: ""
+  whoIsAttacker:
+    type: String
+    enum: ["A", "B", ""]
+    default: ""
   
 Game = mongoose.model "Game", game
 exports.Game = Game
