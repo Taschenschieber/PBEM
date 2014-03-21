@@ -2,3 +2,12 @@ table#login {
   border-spacing: 5px;
   padding: 5px;
 }
+
+table.game-header th, table.game-header td {
+  text-align: center;
+  background: #F5F5DC; /* beige */
+}
+
+td.active-player {
+  color: red;
+}

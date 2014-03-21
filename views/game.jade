@@ -17,10 +17,29 @@ block secondary-nav
 block content
   h1
     = game.scenarioId 
-    small 
-      = " "+game.playerA  
-      | &nbsp;against 
-      = game.playerB
+    small &nbsp;Scenario without title
+    //- scenario title should be supplied here
+      
+  table.game-header(width="100%")
+    tr
+      td(width="80px" rowspan="4"): img(src=avatarA)
+      th(width="*"): a(href="/user/"+game.playerA)= game.playerA
+      th(width="*"): a(href="/user/"+game.playerB)= game.playerB
+      td(width="80px" rowspan="4"): img(src=avatarB)
+    tr
+      td Scenario Defender
+      td Scenario Attacker
+    tr
+      td Germany
+      td USA
+    //- TODO Replace mockup by actual logic
+    tr
+      if(activePlayer == game.playerA)
+        td.active-player Active Player
+        td
+      else
+        td
+        td.alert Active Player
       
   if game.logs.length == 0
     p 

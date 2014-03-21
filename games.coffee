@@ -1,6 +1,8 @@
 common = require "./common"
 mkdirp = require "mkdirp"
 fs = require "fs"
+
+gravatar = require "gravatar"
 database = common.database
 
 exports.setupRoutes = (app) ->
@@ -44,17 +46,29 @@ exports.setupRoutes = (app) ->
           data.activePlayer = ""
       
       data.game = game
-      res.render "game.jade", data
+      # get player profiles
+      database.User.find
+        $or: [{name: game.playerB}, {name: game.playerA}]
+      , (err, users) ->
+        for user in users
+          if user.name == game.playerA
+            data.avatarA = gravatar.url user.email, {}
+          else
+            data.avatarB = gravatar.url user.email, {}
+          
+        data.avatarA = 
+        res.render "game.jade", data
       
   app.get "/game/:id/upload", (req,res) ->
     res.render "uploadLogfile.jade", assembleData(req, res)
   
   app.post "/game/:id/upload/do", (req,res) ->
     # create database document in order to have an ID
-    log = new database.Log
+    log = new database.Log 
       sentBy: req.user.name
       empty: false
-      
+    
+    
     database.Game.findOne {_id: req.params.id}
       .exec (err, game) ->
         if err || not game
