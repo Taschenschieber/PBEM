@@ -17,7 +17,7 @@ block secondary-nav
 block content
   h1
     = game.scenarioId 
-    small &nbsp;Scenario without title
+    small= " "+(scenario.title || "Unknown Scenario")
     //- scenario title should be supplied here
       
   table.game-header(width="100%")

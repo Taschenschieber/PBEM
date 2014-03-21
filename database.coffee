@@ -8,6 +8,41 @@ db.once("open", () -> console.log("DB connection established."))
 
 mongoose.connect "mongodb://localhost/pbem"
 
+scenario = new mongoose.Schema
+  number:
+    type: String # because alphanumeric scenario IDs (SK, ASL classic, most TPPs)
+    unique: true
+    key: true
+  title:
+    type: String
+    key: true
+    unique: false
+  attacker:
+    nation:
+      type: String # TODO figure out validation
+  defender:
+    nation:
+      type: String
+      
+exports.Scenario = Scenario = mongoose.model "Scenario", scenario
+
+# create an initial entry for debugging purposes if table is empty
+Scenario.count {}, (err, result) ->
+  console.log result, " scenarios in database"
+  if result == 0
+    new Scenario
+      number: "A"
+      title: "The Guards Counterattack"
+      attacker:
+        nation: "USSR"
+      defender:
+        nation: "Germany"
+    .save (err) ->
+      console.log err.message
+        
+# Another TODO: Find a source for scenario data and auto-import it to MongoDB
+        
+
 log = new mongoose.Schema
   sentBy: String # the player who sent the log
   empty: Boolean # for these times when a player has no actions and 

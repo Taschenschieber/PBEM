@@ -1,6 +1,7 @@
 common = require "./common"
 mkdirp = require "mkdirp"
 fs = require "fs"
+error = require "./error"
 
 gravatar = require "gravatar"
 database = common.database
@@ -55,9 +56,15 @@ exports.setupRoutes = (app) ->
             data.avatarA = gravatar.url user.email, {d: "identicon"}
           else
             data.avatarB = gravatar.url user.email, {d: "identicon"}
+        # get scenario information, if available
+        database.Scenario.findOne
+          number: game.scenarioId
+        , (err, sc) ->
+          return error.handle err if err
+          data.scenario = sc || {}
           
-        data.avatarA = 
-        res.render "game.jade", data
+          data.avatarA = 
+          res.render "game.jade", data
       
   app.get "/game/:id/upload", (req,res) ->
     res.render "uploadLogfile.jade", assembleData(req, res)

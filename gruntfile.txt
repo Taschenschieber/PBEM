@@ -1,5 +1,0 @@
-coffee: {
-  compile: {
-    files: {"*.js", "*.coffee" }
-  }
-}
