@@ -1,6 +1,6 @@
 mixin notifications(notifications)
   ul.dropdown-menu#notifications-menu
-    li: a(href="javascript:deleteNotifications()") Delete all
+    li: a(href="javascript:window.deleteNotifications()") Delete all
     - each notification in notifications
       li: a(href="/notifications/" + notification._id)= notification.text
 

@@ -9,7 +9,7 @@ common = require "./common"
 notifications = require "./notification-loader"
 config = require "./config"
 user = require "./user"
-
+ajax = require "./ajax"
 
 
 
@@ -66,6 +66,7 @@ auth.setupRoutes app
 games.setupRoutes app
 user.setupRoutes app
 notifications.setupRoutes app
+ajax.setupRoutes app
 
 app.listen(8080)
 console.log "Server listening at 8080"
