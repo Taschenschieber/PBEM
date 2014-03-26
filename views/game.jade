@@ -1,9 +1,8 @@
 extend layout
 
 mixin logs(game)
-  p: a(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log file
   table#logs-table
-    - for(var i = game.logs.length-1; i != 0; i--)
+    - for(var i = game.logs.length-1; i >= 0; i--)
       if game.logs[i].empty
         tr
           th(colspan=20) No actions taken
@@ -102,10 +101,11 @@ block content
   
   else
     if req && req.user
+      - var isactive = false
       if (activePlayer == req.user.name)
+        - isactive = true
         p 
           | It is your turn to move. 
-          a(href="/game/"+game._id+"/upload") Upload your next log now?
       else if(activePlayer == "")
         p
           | Invalid data. The software can not determine whose turn it is. If it is your turn, 
@@ -116,6 +116,14 @@ block content
           | It is 
           a(href="/user/"+activePlayer)= activePlayer
           | 's turn to move.
+      p
+        a.btn.btn-info.active(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log
+        | &nbsp;
+        if game.result == "ongoing"
+          if isactive
+            a.btn.btn-primary.btn-large.active(href="/game/"+game._id+"/upload", role="button") Upload log 
+          | &nbsp;
+          a.btn.btn-danger.btn-large.active(href="/game/"+game._id+"/resign", role="button") Resign
     else      
       p
         | It is

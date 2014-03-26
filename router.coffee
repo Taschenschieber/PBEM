@@ -18,7 +18,7 @@ auth = require "./auth"
 app = express()
 
 error = (err,req,res,next) -> res.send("ERROR: ", err, "STACKTRACE: ", err.stack)
-error404 = (req,res,next) -> res.render "404.jade", {req:req,res:res}
+error404 = (req,res,next) -> res.status(404).render "404.jade", {req:req,res:res}
   
 app.configure () ->
   # static files go first

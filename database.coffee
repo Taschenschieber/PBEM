@@ -103,7 +103,8 @@ game = new mongoose.Schema
     
   result:
     type: String
-    enum: ["ongoing", "defender", "attacker", "cancelled", "draw"]
+    enum: ["ongoing", "winA", "winB", "cancelled", "draw"]
+    default: "ongoing"
   
 Game = mongoose.model "Game", game
 exports.Game = Game

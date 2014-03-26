@@ -77,6 +77,33 @@ exports.setupRoutes = (app) ->
           
           data.avatarA = 
           res.render "game.jade", data
+          
+  app.get "/game/:id/resign", (req, res) ->
+    game = database.Game.findOne
+      _id: req.params.id
+    .exec (err, game) ->
+      return error.handle err if err
+      if not game
+        req.flash "error", "The game you want to resign from does not exist."
+        return res.redirect "/games"
+        
+      result = ""
+      result = "winB" if req.user.name == game.playerA
+      result = "winA" if req.user.name == game.playerB
+      
+      if result is ""
+        req.flash "error", "You have no access to this game."
+        return res.redirect "/games"
+        
+      game.result = result
+        
+      game.save (err) ->
+        if err
+          req.flash "error", "There was an error while writing to the database."
+        else
+          req.flash "info", "You resigned from this game."
+        res.redirect "/game/"+req.params.id
+      
       
   app.get "/game/:id/upload", (req,res) ->
     res.render "uploadLogfile.jade", assembleData(req, res)
