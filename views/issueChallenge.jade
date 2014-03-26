@@ -7,10 +7,11 @@ block content
   h1 Issue a challenge
   p This page allows you to issue a challenge to another user. The user can review the challenge and accept or decline it.
   p Challenges can be taken back until they are accepted.
-  form(method="post", action="/do/games/challenge/issue")
-      .form-group
+  form(method="post", action="/do/games/challenge/issue", autocomplete="off")
+      .form-group#opponent-area
         label Opponent
-        input.form-control#opponent(type="text", name="opponent")
+        input.form-control#opponent(type="text", name="opponent", onkeypress="javascript:window.opponent();", autocomplete="off")
+        label.suggestions Suggestions
       .form-group
         label Time control
         select.form-control#timecontrol(name="timecontrol")
@@ -20,12 +21,13 @@ block content
           option(value="1m") 1 month per match
           option(value="3m") 3 months per match
           option(value="sand48h") 48 hours - hourglass
-      .form-group
+      .form-group#scenario-area
         label Scenario
-        input.form-control#scenario(type="text", name="scenario")
+        input.form-control#scenario(type="text", name="scenario", onkeypress="javascript:window.scenario();")
+        label.suggestions Suggestions
       .checkbox
         label
-          input.form-control#dyo(type="checkbox", name="dyo", onchange="javascript:window.dyo();")
+          input.form-control#dyo(type="checkbox", name="dyo", onchange="javascript:window.dyo();", autocomplete="off")
           | DYO / Custom scenario
       .form-group
         label Message

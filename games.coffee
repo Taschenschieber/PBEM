@@ -185,7 +185,7 @@ exports.setupRoutes = (app) ->
       from: req.user.name
       to: req.body.opponent
       timeControl: req.body.timecontrol
-      scenarioId: req.body.scenario
+      scenarioId: req.body.scenario.trim().split(" ")[0]
       dyo: req.body.dyo
       message: req.body.message
     }

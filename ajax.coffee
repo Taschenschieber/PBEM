@@ -26,3 +26,18 @@ exports.setupRoutes = (app) ->
       if not scenarios
         res.status(404).send "No such data"
       else res.send scenarios
+  
+  app.get "/ajax/user/:text", (req,res) ->
+    text = req.params.text
+    database.User.find 
+      name:
+        $regex: text
+        $options: "i"
+    .limit 3
+    .select "name" # only select the name, only thing the client needs
+    .exec (err, users) ->
+      console.log err if err
+      if err || not users
+        res.status(404).send "No such user"
+      else
+        res.send users

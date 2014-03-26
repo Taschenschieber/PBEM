@@ -21,23 +21,50 @@
     }
   };
 
+  window.scenario = function() {
+    var text;
+    text = $("#scenario").val();
+    if (text) {
+      return $.ajax("/ajax/scenario/" + encodeURI(text)).done(function(results, status) {
+        var html, result, _i, _len;
+        console.log(results);
+        html = "";
+        for (_i = 0, _len = results.length; _i < _len; _i++) {
+          result = results[_i];
+          html += "<a href='javascript:window.selectScenario(\"" + result.number + "\", \"" + result.title + "\")'><strong>" + result.number + "</strong> - " + result.title + "</a>&nbsp;";
+        }
+        return $("#scenario-area .suggestions").html(html);
+      });
+    }
+  };
+
+  window.opponent = function() {
+    var text;
+    text = $("#opponent").val();
+    if (text) {
+      return $.ajax("/ajax/user/" + encodeURI(text)).done(function(results, status) {
+        var html, result, _i, _len;
+        html = "";
+        for (_i = 0, _len = results.length; _i < _len; _i++) {
+          result = results[_i];
+          html += "<a href=\"javascript:window.selectUser('" + result.name + "');\">" + result.name + "</a>&nbsp;";
+        }
+        return $("#opponent-area .suggestions").html(html);
+      });
+    }
+  };
+
 
   /*
-  window.scenario = () ->
-    text = $("#scenario").val()
-    if text
-      $.ajax "/ajax/scenario/"+encodeURI(text)
-        .done (result, status) ->
-          console.log result # TODO reasonable handling here
-          alert result
+     *
    */
 
-  $(function() {
-    return $('.form-group #scenario').typeahead(null, {
-      name: 'scenario-matches',
-      displayKey: 'value',
-      remote: "/ajax/scenario/%QUERY"
-    });
-  });
+  window.selectScenario = function(number, title) {
+    $("#scenario").val(number + " - " + title);
+  };
+
+  window.selectUser = function(user) {
+    $("#opponent").val(user);
+  };
 
 }).call(this);
