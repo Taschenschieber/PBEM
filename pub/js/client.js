@@ -67,4 +67,14 @@
     $("#opponent").val(user);
   };
 
+
+  /*
+     *  tabbing
+   */
+
+  $("a[data-toggle='tab']").on("shown.bs.tab", function(event) {
+    event.preventDefault;
+    return $(event.target).tab("show");
+  });
+
 }).call(this);

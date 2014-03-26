@@ -1,0 +1,17 @@
+extends ../layout
+
+block secondary-nav
+  include secondary-nav-users
+  
+block content
+  h1 
+    | Hello, 
+    = req.user.name
+    | !
+  if req.newMessages
+    p
+      | You have 
+      = req.newMessages
+      | &nbsp;unread messages.
+  else
+    p You have no unread messages.

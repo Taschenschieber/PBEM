@@ -57,3 +57,11 @@ window.selectScenario = (number, title) ->
 window.selectUser = (user) ->
   $("#opponent").val(user)
   return # NOTE: Explicit "return" is necessary to prevent unwanted redirect
+  
+###
+  #  tabbing
+###
+$("a[data-toggle='tab']").on "shown.bs.tab", (event) ->
+  event.preventDefault
+  $(event.target).tab("show")
+  

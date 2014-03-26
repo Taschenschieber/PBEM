@@ -8,6 +8,17 @@ db.once("open", () -> console.log("DB connection established."))
 
 mongoose.connect "mongodb://localhost/pbem"
 
+message = new mongoose.Schema
+  from: String
+  to: String
+  message: String
+  sent:
+    type: Date
+    default: Date.now
+  subject: String
+  
+exports.Message = Message = mongoose.model "Message", message
+  
 scenario = new mongoose.Schema
   number:
     type: String # because alphanumeric scenario IDs (SK, ASL classic, most TPPs)
@@ -143,6 +154,8 @@ userSchema = new mongoose.Schema
       type: Boolean, default: false
     onChallenge:
       type: Boolean, default: false
+  inbox: [message]
+  outbox: [message]
   
   
 # encryption 

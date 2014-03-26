@@ -21,7 +21,7 @@ td.active-player {
   text-align: left;
 }
 
-#logs-table {
+#logs-table, table.messages {
   width: 100%
 }
 

@@ -1,0 +1,63 @@
+extends ../layout
+
+
+//- type 1 for inbox, 2 for outbox
+
+mixin box(messages, type) 
+  table.messages
+    tr
+      if type == 1
+        th(colspan=3) Sender
+      else
+        th(colspan=3) Recipient
+      th Subject
+    for msg in messages
+      if msg
+        tr
+          td: a(href="/user/"+req.user.name+"/message/"+msg._id)
+            span.glyphicon.glyphicon-hand-right
+          if type == 1
+            td= msg.from
+          else
+            td= msg.to
+          td= msg.sent 
+          //- TODO nice formatting
+          td= msg.subject
+        
+    
+
+block secondary-nav
+  include secondary-nav-users
+  
+block content
+  h1 Messenger
+  ul.nav.nav-tabs
+    li.active: a(href="#inbox", data-toggle="tab") Inbox
+    li: a(href="#outbox", data-toggle="tab") Outbox
+    li: a(href="#write", data-toggle="tab") Write Message
+    
+  .tab-content
+    .tab-pane.active#inbox
+      if req.user.inbox && req.user.inbox.length
+        +box(req.user.inbox, 1)
+      else
+        p Your inbox is empty.
+        
+    .tab-pane#outbox
+      if req.user.outbox && req.user.outbox.length
+        +box(req.user.outbox, 2)
+      else
+        p Your outbox is empty.
+    
+    .tab-pane#write
+      form(method="POST", action="/users/messenger/do/send", autocomplete="off")
+        .form-group
+          label Recipient
+          input.form-control(type="text", name="to")
+        .form-group
+          label Subject
+          input.form-control(type="text", name="subject")
+        .form-group
+          label Message
+          textarea.form-control(name="message")
+         button.btn.btn-primary(type="submit") Send
