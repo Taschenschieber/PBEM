@@ -9,6 +9,7 @@
 # /users/messenger/do/send - send a message. POST.
 # /user/:name - profile for :name
 # /user/message/:id - read message
+# /user/message/:id/delete - delete message from inbox/outbox
 
 
 database = require "./database"
@@ -24,6 +25,12 @@ exports.setupRoutes = (app) ->
     
   app.get "/users/messenger", (req,res) ->
     data = {req:req,res:res}
+    # fancy dates
+    for msg in req.user.inbox
+      msg.fancyDate = moment(msg.sent).fromNow()
+    for msg in req.user.outbox
+      msg.fancyDate = moment(msg.sent).fromNow()
+
     res.render "user/messenger.jade", data
 
   app.get "/user/:name", (req,res) ->
@@ -51,6 +58,32 @@ exports.setupRoutes = (app) ->
         return res.render "user/message.jade", data
     req.flash "error", "The message you tried to open does not exist."
     res.redirect "/users/messenger"
+    
+    
+  app.get "/user/message/:msgid/delete", (req,res) ->
+    saveChanges = (user) ->
+      user.save (err) ->
+        return error.handle err if err
+        req.flash "info", "Message deleted."
+        res.redirect "/users/messenger"
+  
+    for msg in req.user.inbox
+      if msg.id is req.params.msgid
+        index = req.user.inbox.indexOf msg
+        if index >= 0
+          req.user.inbox.splice(index, 1)
+          return saveChanges(req.user)
+          
+    for msg in req.user.outbox
+      if msg.id is req.params.msgid
+        index = req.user.outbox.indexOf msg
+        if index >= 0
+          req.user.outbox.splice(index, 1)
+          return saveChanges(req.user)
+    
+    req.flash "error", "This message does not exist."
+    res.redirect "/users/messenger"
+    
       
   app.post "/users/messenger/do/send", (req, res) ->
     message = new database.Message # TODO Validate!

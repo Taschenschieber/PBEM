@@ -20,7 +20,7 @@ mixin box(messages, type)
             td= msg.from
           else
             td= msg.to
-          td= msg.sent 
+          td= msg.fancyDate || msg.sent 
           //- TODO nice formatting
           td= msg.subject
         

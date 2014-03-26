@@ -12,6 +12,7 @@ block content
     = msg.to
     | , 
     = fancyDate || msg.sent
+  p: a(href="/user/message/"+msg.id+"/delete") Delete
     
   p= msg.message
   
