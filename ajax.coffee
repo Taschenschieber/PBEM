@@ -23,4 +23,6 @@ exports.setupRoutes = (app) ->
     .exec (err, scenarios) ->
       console.log err if err
       console.log scenarios
-      res.send scenarios || {}
+      if not scenarios
+        res.status(404).send "No such data"
+      else res.send scenarios

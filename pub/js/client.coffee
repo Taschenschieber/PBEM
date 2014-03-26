@@ -27,5 +27,3 @@ window.scenario = () ->
       .done (result, status) ->
         console.log result # TODO reasonable handling here
         alert result
-
-  

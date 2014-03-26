@@ -64,8 +64,12 @@ Log = mongoose.model "Log", log
 exports.Log = Log
 
 game = new mongoose.Schema
-  playerA: String
-  playerB: String
+  playerA: 
+    type: String
+    index: true
+  playerB: 
+    type: String
+    index: true
   kibitzers: [String] # list of usernames who watch the game
   started:
     type: Date, default: Date.now
@@ -90,8 +94,12 @@ Game = mongoose.model "Game", game
 exports.Game = Game
 
 challenge = new mongoose.Schema
-  from: String # the user the challenge is issued to
-  to: String # the user the challenge is issued to
+  from: 
+    type: String # the user the challenge is issued to
+    index: true
+  to: 
+    type: String # the user the challenge is issued to
+    index: true
   sent: 
     type: Date, default: Date.now
   timeControl: String # the time control mode. Probably best to define some constants somewhere.
@@ -103,7 +111,9 @@ Challenge = mongoose.model "Challenge", challenge
 exports.Challenge = Challenge  
 
 notificationSchema = new mongoose.Schema
-  username: String
+  username: 
+    type: String
+    index: true
   text: String
   action: String # url
   date: 
@@ -112,7 +122,9 @@ notificationSchema = new mongoose.Schema
 exports.Notification = Notification = mongoose.model "Notification", notificationSchema
 
 userSchema = new mongoose.Schema
-  name: String
+  name: 
+    type: String
+    index: true
   password: String
   email: String
   validationToken: 

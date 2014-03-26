@@ -21,15 +21,23 @@
     }
   };
 
-  window.scenario = function() {
-    var text;
-    text = $("#scenario").val();
-    if (text) {
-      return $.ajax("/ajax/scenario/" + encodeURI(text)).done(function(result, status) {
-        console.log(result);
-        return alert(result);
-      });
-    }
-  };
+
+  /*
+  window.scenario = () ->
+    text = $("#scenario").val()
+    if text
+      $.ajax "/ajax/scenario/"+encodeURI(text)
+        .done (result, status) ->
+          console.log result # TODO reasonable handling here
+          alert result
+   */
+
+  $(function() {
+    return $('.form-group #scenario').typeahead(null, {
+      name: 'scenario-matches',
+      displayKey: 'value',
+      remote: "/ajax/scenario/%QUERY"
+    });
+  });
 
 }).call(this);
