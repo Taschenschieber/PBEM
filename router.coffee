@@ -10,19 +10,15 @@ notifications = require "./notification-loader"
 config = require "./config"
 user = require "./user"
 ajax = require "./ajax"
-
-
+error = require "./error"
+games = require "./games"
+database = require "./database"
+auth = require "./auth"
 
 app = express()
 
-database = common.database
-
-auth = common.auth
-games = require "./games"
-
-  
 error = (err,req,res,next) -> res.send("ERROR: ", err, "STACKTRACE: ", err.stack)
-error404 = (req,res,next) -> res.render("404.jade")
+error404 = (req,res,next) -> res.render "404.jade", {req:req,res:res}
   
 app.configure () ->
   # static files go first
@@ -47,6 +43,8 @@ app.configure () ->
   app.use notifications.populate
   app.use flash()
   app.use app.router
+  
+  app.use error404
   
   # NOTE: For some weird reason, notifications.populate fails when called 
   # immediately before app.router.

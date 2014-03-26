@@ -222,3 +222,4 @@ uploads/
 *.vlog
 pub/logfiles/
 config.*
+data
