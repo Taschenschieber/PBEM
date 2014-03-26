@@ -246,8 +246,11 @@ exports.setupRoutes = (app) ->
         # send notification
         database.createNotification challenge.to, req.user.name + " accepted your challenge!", "/game/"+game._id, (err) ->
           console.log err if err
+          
+        challenge.remove (err) ->
+          console.log err if err
         res.redirect "/game/" + game._id
-       
+        
 
   app.get "/challenges/:id/decline", (req,res) -> # TODO Authenticate
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
