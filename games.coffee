@@ -26,7 +26,7 @@ exports.setupRoutes = (app) ->
   
   app.get "/games/my/active", (req,res) ->
     data = assembleData req, res
-    database.Game.find {$or: [{playerA: req.user.name}, {playerB: req.user.name}]}, (err, games) ->
+    database.Game.find {$and: [$or: [{playerA: req.user.name}, {playerB: req.user.name}], result: "ongoing"]}, (err, games) ->
       res.send err if (err)
       
       data.games = games

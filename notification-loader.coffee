@@ -25,8 +25,8 @@ exports.populate = (req, res, next) ->
         # TODO implement messages
         
         database.Game.count
-          $or: [{playerA: name, whoseTurn: "A"}, {playerB: name, whoseTurn: "B"},
-          {playerA: name, whoseTurn: ""}, {playerB: name, whoseTurn: ""}]
+          $and: [$or: [{playerA: name, whoseTurn: "A"}, {playerB: name, whoseTurn: "B"},
+          {playerA: name, whoseTurn: ""}, {playerB: name, whoseTurn: ""}], result: "ongoing"]
         , (err, number) ->
           console.log err if err
           req.bullets = {}
