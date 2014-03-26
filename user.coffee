@@ -8,11 +8,14 @@
 # /users/messenger - Messenger. Duh.
 # /users/messenger/do/send - send a message. POST.
 # /user/:name - profile for :name
+# /user/message/:id - read message
 
 
 database = require "./database"
 error = require "./error"
 gravatar = require "gravatar"
+moment = require "moment"
+flash = require "connect-flash"
 
 exports.setupRoutes = (app) ->
   app.get "/users", (req, res) ->
@@ -34,6 +37,20 @@ exports.setupRoutes = (app) ->
       data.user = user
       data.avatar = gravatar.url user.email, {d: "identicon"}
       res.render "user/profile_public.jade", data
+      
+  app.get "/user/message/:msgid", (req, res) ->
+    data = {req:req,res:res}
+    # try and find message
+    for msg in req.user.inbox.concat(req.user.outbox)
+      console.log msg.id
+      console.log req.params.msgid
+      if msg.id is req.params.msgid
+        console.log "Found match"
+        data.msg = msg
+        data.fancyDate = moment(data.sent).fromNow()
+        return res.render "user/message.jade", data
+    req.flash "error", "The message you tried to open does not exist."
+    res.redirect "/users/messenger"
       
   app.post "/users/messenger/do/send", (req, res) ->
     message = new database.Message # TODO Validate!

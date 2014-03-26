@@ -1,0 +1,17 @@
+extends ../layout
+
+block secondary-nav
+  include secondary-nav-users
+   
+block content
+  h1= msg.subject
+  p: em
+    | From 
+    = msg.from
+    | &nbsp;to 
+    = msg.to
+    | , 
+    = fancyDate || msg.sent
+    
+  p= msg.message
+  

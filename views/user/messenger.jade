@@ -14,7 +14,7 @@ mixin box(messages, type)
     for msg in messages
       if msg
         tr
-          td: a(href="/user/"+req.user.name+"/message/"+msg._id)
+          td: a(href="/user/message/"+msg._id)
             span.glyphicon.glyphicon-hand-right
           if type == 1
             td= msg.from
