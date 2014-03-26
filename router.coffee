@@ -1,6 +1,6 @@
 flash = require "connect-flash"
 express = require "express"
-
+fs = require "fs"
 redis = require "redis"
 RedisStore = require("connect-redis")(express)
 store = new RedisStore
@@ -58,6 +58,15 @@ app.get "/login", (req,res) -> res.render("login.jade", assembleData(req,res))
 
 app.get "/signup", (req,res) -> res.render("signup.jade", assembleData(req,res))
 app.get "/error", (req,res) -> res.render("error.jade", assembleData(req,res))
+
+app.get "/help/:topic", (req,res) ->
+  topic = req.params.topic
+  if fs.existsSync __dirname+"/views/help/"+topic+".jade"
+    res.render "help/"+topic+".jade", {req:req,res:res}
+  # no err handling necessary, middleware will catch it
+  
+app.get "/help", (req,res) ->
+  res.redirect "/help/index"
 
 # Login handler
 auth.setupRoutes app
