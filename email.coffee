@@ -1,14 +1,14 @@
 # contains all e-mail related functions - setup, sending and later receiving mail
 
+nodemailer = require "nodemailer"
 
 # Please note: "config.coffee" is not included in the public github because
 # it contains credentials for e-mail transport. 
 config = require "./config"
 database = require "./database"
-
+emailimap = require "./email-imap"
 
 # set up mail transport
-nodemailer = require "nodemailer"
 transport = nodemailer.createTransport "SMTP", config.email
 
 # Create a tagged mail address for log files sent to the server
@@ -94,7 +94,11 @@ exports.sendLogMail = (game, callback) ->
       attachments: attachments
     , (err, res) ->
       callback err, res
-      
+
+exports.handleAttachment = (gameId, attachment, message) ->
+  console.log gameId
+  console.log attachment?
+  console.log message
 
 # send a newly-registered user an e-mail asking him to confirm his address
 # user = the relevant database entry (conforming to UserSchema)
