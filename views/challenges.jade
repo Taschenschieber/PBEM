@@ -11,7 +11,12 @@ mixin incoming(challengers)
         ul
           li 
             b Scenario:  
-            = challenger.scenarioId || "DYO"
+            if challenger.scenario && challenger.scenario.number
+              strong= challenger.scenario.number + " "
+              if challenger.scenario.title
+                = challenger.scenario.title
+            else
+              | Custom Scenario / DYO
           li
             b Time Control: 
             = challenger.timeControl
@@ -38,7 +43,12 @@ mixin outgoing(challenges)
         ul
           li 
             b Scenario:  
-            = challenge.scenarioId || "DYO"
+            if challenge.scenario && challenge.scenario.number
+              strong= challenge.scenario.number +" "
+              if challenge.scenario.title
+                = challenge.scenario.title
+            else
+              | Custom Scenario / DYO
           li
             b Time Control: 
             = challenge.timeControl

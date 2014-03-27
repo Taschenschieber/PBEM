@@ -85,7 +85,9 @@ game = new mongoose.Schema
   started:
     type: Date, default: Date.now
   timeControl: String
-  scenarioId: String # null if DYO
+  scenario: 
+    type: String 
+    ref: "Scenario"
   active:
     type: Boolean, default: true # set to false once completed / aborted
   result:
@@ -119,7 +121,9 @@ challenge = new mongoose.Schema
   sent: 
     type: Date, default: Date.now
   timeControl: String # the time control mode. Probably best to define some constants somewhere.
-  scenarioId: String
+  scenario: 
+    type: String
+    ref: "Scenario"
   dyo: Boolean
   message: String
   

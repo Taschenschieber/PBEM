@@ -23,7 +23,7 @@
 
   window.scenario = function() {
     var text;
-    text = $("#scenario").val();
+    text = $("#scenarioText").val();
     if (text) {
       return $.ajax("/ajax/scenario/" + encodeURI(text)).done(function(results, status) {
         var html, result, _i, _len;
@@ -31,7 +31,7 @@
         html = "";
         for (_i = 0, _len = results.length; _i < _len; _i++) {
           result = results[_i];
-          html += "<a href='javascript:window.selectScenario(\"" + result.number + "\", \"" + result.title + "\")'><strong>" + result.number + "</strong> - " + result.title + "</a>&nbsp;";
+          html += "<a href='javascript:window.selectScenario(" + ('"' + result._id + '"') + ", " + ('"' + result.number + '"') + ", " + ('"' + result.title + '"') + ")'><strong>" + result.number + " </strong> - " + result.title + "</a><br />";
         }
         return $("#scenario-area .suggestions").html(html);
       });
@@ -59,8 +59,9 @@
      *
    */
 
-  window.selectScenario = function(number, title) {
-    $("#scenario").val(number + " - " + title);
+  window.selectScenario = function(id, number, title) {
+    $("#scenarioText").val(number + " - " + title);
+    $("input[name=scenario]").val(id);
   };
 
   window.selectUser = function(user) {

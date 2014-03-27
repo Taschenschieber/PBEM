@@ -24,17 +24,28 @@ exports.setupRoutes = (app) ->
   app.get "/games/my/challenges", (req,res) ->
     data = assembleData req,res
     # load challenges from database
-    database.findChallengesFor req.user.name, (err, challengers) ->
-      return res.redirect "/error" if err
+    database.Challenge.find
+      to: req.user.name
+    .populate "scenario"
+    .exec (err, challengers) ->
+      console.log challengers if challengers
+      return error.handle err if err
       data.challengers = challengers || []
-      database.findChallengesFrom req.user.name, (err, challenges) ->
-        return res.redirect "/error" if err
+      
+      database.Challenge.find
+        from: req.user.name
+      .populate "scenario"
+      .exec (err, challenges) ->
+        return error.handle err if err
         data.challenges = challenges || []
         res.render "challenges.jade", data
   
   app.get "/games/my/active", (req,res) ->
     data = assembleData req, res
-    database.Game.find {$and: [$or: [{playerA: req.user.name}, {playerB: req.user.name}], result: "ongoing"]}, (err, games) ->
+    database.Game.find 
+      $and: [$or: [{playerA: req.user.name}, {playerB: req.user.name}], result: "ongoing"]
+    .populate "scenario"
+    .exec (err, games) ->
       res.send err if (err)
       
       data.games = games
@@ -44,7 +55,10 @@ exports.setupRoutes = (app) ->
   
   app.get "/game/:id", (req,res) ->
     data = assembleData req,res
-    database.Game.findOne {_id: req.params.id}, (err, game) ->
+    database.Game.findOne 
+      _id: req.params.id
+    .populate "scenario"
+    .exec (err, game) ->
       res.send err if (err || !game)
       # find out whose turn it is
       if game.whoseTurn == "A"
@@ -56,7 +70,6 @@ exports.setupRoutes = (app) ->
       
       
       # do some date formatting
-      i = 0
       for log in game.logs
         log.prettyDate = moment(log.date).fromNow()
         log.prettyFirstPhase = getPhaseByID log.firstPhase
@@ -75,15 +88,7 @@ exports.setupRoutes = (app) ->
           else
             data.avatarB = "/user/"+user.name+"/avatar"
             data.avatarBsmall = data.avatarB + "/32"
-
-        # get scenario information, if available
-        database.Scenario.findOne
-          number: game.scenarioId
-        , (err, sc) ->
-          return error.handle err if err
-          data.scenario = sc || {}
           
-          data.avatarA = 
           res.render "game.jade", data
           
   app.get "/game/:id/resign", (req, res) ->
@@ -220,7 +225,7 @@ exports.setupRoutes = (app) ->
       from: req.user.name
       to: req.body.opponent
       timeControl: req.body.timecontrol
-      scenarioId: req.body.scenario.trim().split(" ")[0]
+      scenario: req.body.scenario
       dyo: req.body.dyo
       message: req.body.message
     

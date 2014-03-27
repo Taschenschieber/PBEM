@@ -23,7 +23,8 @@ block content
           option(value="sand48h") 48 hours - hourglass
       .form-group#scenario-area
         label Scenario
-        input.form-control#scenario(type="text", name="scenario", onkeypress="javascript:window.scenario();")
+        input#scenario(type="hidden", name="scenario")
+        input.form-control#scenarioText(type="text", name="scenarioText", onkeypress="javascript:window.scenario();")
         label.suggestions Suggestions
       .checkbox
         label

@@ -21,16 +21,18 @@ window.dyo = () ->
   
 # autocomplete scenarios
 window.scenario = () ->
-  text = $("#scenario").val()
+  text = $("#scenarioText").val()
   if text
     $.ajax "/ajax/scenario/"+encodeURI(text)
       .done (results, status) ->
         console.log results # TODO reasonable handling here
         html = ""
         for result in results
-          html += "<a href='javascript:window.selectScenario(\""+result.number+
-            "\", \""+result.title+"\")'><strong>"+result.number+"</strong> - "+
-            result.title+"</a>&nbsp;"
+          html += "
+          <a href='javascript:window.selectScenario(#{'"'+result._id+'"'}, #{'"'+result.number+'"'}, #{'"'+result.title+'"'})'><strong>#{result.number}
+          </strong> - #{result.title}</a><br />
+          "
+          # my head hurts
         
         $("#scenario-area .suggestions").html(html)
 
@@ -50,8 +52,9 @@ window.opponent = () ->
 ###
   #
 ###
-window.selectScenario = (number, title) ->
-  $("#scenario").val(number + " - " + title)
+window.selectScenario = (id, number, title) ->
+  $("#scenarioText").val(number + " - " + title)
+  $("input[name=scenario]").val id
   return
 
 window.selectUser = (user) ->

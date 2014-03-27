@@ -6,8 +6,8 @@ mixin list(games)
       tr
         td= game.playerA
         td= game.playerB
-        if game.scenarioId
-          td= game.scenarioId
+        if game.scenario.number
+          td= game.scenario.number
         else
           td DYO
         td: a(href="/game/"+game.id) Details...
