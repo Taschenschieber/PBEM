@@ -34,7 +34,7 @@ exports.setupRoutes = (app) ->
         $regex: text
         $options: "i"
     .limit 3
-    .select "name _id" # only select the name, only thing the client needs
+    .select "name _id id attacker defender"
     .exec (err, users) ->
       console.log err if err
       if err || not users

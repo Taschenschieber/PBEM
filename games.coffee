@@ -24,18 +24,20 @@ exports.setupRoutes = (app) ->
   app.get "/games/my/challenges", (req,res) ->
     data = assembleData req,res
     # load challenges from database
+    console.log "TEST0"
     database.Challenge.find
       to: req.user.name
     .populate "scenario"
     .exec (err, challengers) ->
-      console.log challengers if challengers
+      console.log "TEST1"
       return error.handle err if err
       data.challengers = challengers || []
-      
+      console.log "TEST2"
       database.Challenge.find
         from: req.user.name
       .populate "scenario"
       .exec (err, challenges) ->
+        console.log "TEST3"
         return error.handle err if err
         data.challenges = challenges || []
         res.render "challenges.jade", data
@@ -230,6 +232,7 @@ exports.setupRoutes = (app) ->
       scenario: req.body.scenario
       dyo: req.body.dyo
       message: req.body.message
+      whoIsAttacker: req.body.whoIsAttacker
     
     #console.log challenge
     
@@ -259,6 +262,7 @@ exports.setupRoutes = (app) ->
         playerB: challenge.to
         timeControl: challenge.timeControl
         scenario: challenge.scenario
+        whoIsAttacker: challenge.whoIsAttacker
       
       game.save (err) ->
         res.send err if err

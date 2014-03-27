@@ -19,6 +19,8 @@ window.dyo = () ->
     $("#scenario").removeAttr("disabled")
   return
   
+lastScenarios = []  
+  
 # autocomplete scenarios
 window.scenario = () ->
   text = $("#scenarioText").val()
@@ -27,12 +29,14 @@ window.scenario = () ->
       .done (results, status) ->
         console.log results # TODO reasonable handling here
         html = ""
+        lastScenarios = results
+        i = 0
         for result in results
           html += "
-          <a href='javascript:window.selectScenario(#{'"'+result._id+'"'}, #{'"'+result.number+'"'}, #{'"'+result.title+'"'})'><strong>#{result.number}
-          </strong> - #{result.title}</a><br />
+          <a href='javascript:window.selectScenario(#{i})'>
+          <strong>#{result.number}</strong> - #{result.title}</a><br />
           "
-          # my head hurts
+          i = i + 1
         
         $("#scenario-area .suggestions").html(html)
 
@@ -52,9 +56,12 @@ window.opponent = () ->
 ###
   #
 ###
-window.selectScenario = (id, number, title) ->
-  $("#scenarioText").val(number + " - " + title)
-  $("input[name=scenario]").val id
+window.selectScenario = (i) ->
+  sc = lastScenarios[i]
+  $("#scenarioText").val(sc.number + " - " + sc.title)
+  $("input[name=scenario]").val sc._id
+  $("option[value=A]").html (sc.attacker?.nation || "") + " (Attacker)"
+  $("option[value=B]").html (sc.defender?.nation || "") + " (Defender)"
   return
 
 window.selectUser = (user) ->

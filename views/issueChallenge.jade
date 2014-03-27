@@ -26,6 +26,11 @@ block content
         input#scenario(type="hidden", name="scenario")
         input.form-control#scenarioText(type="text", name="scenarioText", onkeypress="javascript:window.scenario();")
         label.suggestions Suggestions
+      .form-group
+        label Your side
+        select.form-control#whoIsAttacker(name="whoIsAttacker")
+          option(value="A") Attacker
+          option(value="B") Defender
       .checkbox
         label
           input.form-control#dyo(type="checkbox", name="dyo", onchange="javascript:window.dyo();", autocomplete="off")

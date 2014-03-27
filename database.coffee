@@ -126,6 +126,10 @@ challenge = new mongoose.Schema
     ref: "Scenario"
   dyo: Boolean
   message: String
+  whoIsAttacker:
+    type: String
+    enum: ["A", "B"] # in keeping with Game, A is the sender and B is receiver
+    # of the challenge
   
 Challenge = mongoose.model "Challenge", challenge
 exports.Challenge = Challenge  

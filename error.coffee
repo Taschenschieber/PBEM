@@ -2,6 +2,6 @@
 #
 # This file offers nice error handling. So far, it is mostly a stub.
 
-exports.handle = (req, res, error) ->
+exports.handle = (error, req, res) ->
   console.log error
   res.send error if res

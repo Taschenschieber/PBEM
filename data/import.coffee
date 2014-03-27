@@ -3,10 +3,13 @@ fs = require "fs"
 database = require "../database"
 Scenario = database.Scenario
 
+Scenario.remove()
+
 csv = csv().from.path(__dirname+"/scenarios.csv")
 .on "record", (row, index) ->
     number = baseNumber = row[4]
     title = row[3]
+    console.log title
     
     if not number?.trim()?
       "Scenario "+title+" has no number. Skipping."
