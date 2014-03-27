@@ -159,7 +159,7 @@ exports.setupRoutes = (app) ->
         game.save (err) ->
           return res.send err if err
           console.log log._id
-          path = __dirname + "/pub/logfiles/"+game._id+"/"+log._id+".vlog"
+          path = __dirname + "/pub/logfiles/"+game._id+"/"+log._id
           console.log "Saving to: ", path
           console.log "Tempfile: ", req.files.logfile.path
           fs.readFile req.files.logfile.path, (err, data) ->

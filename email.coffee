@@ -57,7 +57,7 @@ exports.sendLogMail = (game, callback) ->
       
 
       <ul>
-      <li><a href=http://#{config.server.url}/logs/#{game._id}/#{game.logs[game.logs.length-1]._id}>
+      <li><a href=http://#{config.server.url}/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}>
           Download the log file</a></li>
       <li><a href=http://#{config.server.url}/game/#{game._id}>Open game in browser</a></li>
       </ul>
@@ -68,7 +68,7 @@ exports.sendLogMail = (game, callback) ->
       text += "<p>Additionally, the new log file is also attached to this e-mail.</p>"
       attachments = [
         fileName: "latest.vlog"
-        filePath: "/pub/logs/#{game._id}/#{game.logs[game.logs.length-1]._id}"
+        filePath: "/pub/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}"
       ]
       
     text += "<p>You can either upload your log file on the web site linked 
