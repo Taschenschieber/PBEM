@@ -12,6 +12,7 @@ moment = require "moment"
 avatar = require "./avatar"
 common = require "./common"
 database = require "./database"
+email = require "./email"
 error = require "./error"
 
 
@@ -139,6 +140,7 @@ exports.setupRoutes = (app) ->
     
     
     database.Game.findOne {_id: req.params.id}
+      .populate "scenario" # needed for e-mail handler
       .exec (err, game) ->
         if err || not game
           return res.send err
@@ -188,11 +190,23 @@ exports.setupRoutes = (app) ->
                     console.log " "
                   return res.send err2
                 else
+                  email.sendLogMail game, (err, response) ->
+                    console.log err if err
+                    console.log "Mail transport with response", response if response
+                  notificationTarget = game.playerA
+                  if game.whoseTurn == "B"
+                    notificationTarget = game.playerB
+                  new database.Notification
+                    username: notificationTarget
+                    text: "It's your turn in #{game.scenario.title}!"
+                    action: "/game/#{game.id}"
+                    image: "/avatar/#{req.user.name}"
+                  .save (err) ->
+                    console.log err if err
                   res.redirect "/game/" + game._id
-                  # and done. TODO Add a notification here.
-                  # TODO Add e-mail sending here
+
       
-  app.get "/games/world/active/:page", (req,res) ->
+  app.get "/games/world/active/", (req,res) ->
     data = assembleData req, res
     database.Game.find {active: true}
          #.sort "-started"

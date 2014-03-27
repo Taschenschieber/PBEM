@@ -12,7 +12,6 @@
 database = require "./database"
 
 exports.populate = (req, res, next) ->
-    console.log "Notifications.populate"
     if req.user?.name?
       name = req.user.name
       # user is logged in - get his notifications and populate the request with them
