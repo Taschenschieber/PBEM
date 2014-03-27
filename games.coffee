@@ -61,6 +61,7 @@ exports.setupRoutes = (app) ->
     .populate "scenario"
     .exec (err, game) ->
       res.send err if (err || !game)
+      console.log game.scenario
       # find out whose turn it is
       if game.whoseTurn == "A"
         data.activePlayer = game.playerA

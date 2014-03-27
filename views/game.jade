@@ -59,9 +59,9 @@ block content
         td Scenario Attacker
         td Scenario Defender
       tr
-        if (scenario && scenario.defender && scenario.attacker)
-          td= scenario.defender.nation
-          td= scenario.attacker.nation
+        if (game.scenario && game.scenario.defender && game.scenario.attacker)
+          td= game.scenario.attacker.nation
+          td= game.scenario.defender.nation
         else
           td ???
           td ???
@@ -70,9 +70,9 @@ block content
         td Scenario Defender
         td Scenario Attacker
       tr
-        if (scenario && scenario.defender && scenario.attacker)
-          td= scenario.defender.nation
-          td= scenario.attacker.nation
+        if (game.scenario && game.scenario.defender && game.scenario.attacker)
+          td= game.scenario.defender.nation
+          td= game.scenario.attacker.nation
         else
           td ???
           td ???
