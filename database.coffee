@@ -162,6 +162,15 @@ userSchema = new mongoose.Schema
   inbox: [message]
   outbox: [message]
   
+  profile:
+    # accounts on other platforms
+    gamesquad: String
+    thegeek: String
+    facebook: String
+    gplus: String
+    twitter: String
+    publicEmail: Boolean
+    xmpp: String
   
 # encryption 
 

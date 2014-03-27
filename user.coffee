@@ -11,12 +11,12 @@
 # /user/message/:id - read message
 # /user/message/:id/delete - delete message from inbox/outbox
 
+moment = require "moment"
+flash = require "connect-flash"
 
 database = require "./database"
 error = require "./error"
-gravatar = require "gravatar"
-moment = require "moment"
-flash = require "connect-flash"
+avatar = require "./avatar"
 
 exports.setupRoutes = (app) ->
   app.get "/users", (req, res) ->
@@ -42,7 +42,7 @@ exports.setupRoutes = (app) ->
       return error.handle(req,res,err) if err
       return error.handle(req,res,"No such user!") unless user
       data.user = user
-      data.avatar = gravatar.url user.email, {d: "identicon"}
+      data.avatar = "/user/"+user.name+"/avatar"
       res.render "user/profile_public.jade", data
       
   app.get "/user/message/:msgid", (req, res) ->

@@ -1,12 +1,20 @@
-common = require "./common"
+# (c) 2014 Stephan Hillebrand
+#
+# This file is responsible for handling everything related to creating, playing
+# and watching games.
+#
+# TODO Make nice route listActiveGames
+
 mkdirp = require "mkdirp"
 fs = require "fs"
 moment = require "moment"
 
+avatar = require "./avatar"
+common = require "./common"
+database = require "./database"
 error = require "./error"
 
-gravatar = require "gravatar"
-database = common.database
+
 
 exports.setupRoutes = (app) ->
   #static pages
@@ -62,11 +70,11 @@ exports.setupRoutes = (app) ->
       , (err, users) ->
         for user in users
           if user.name == game.playerA
-            data.avatarA = gravatar.url user.email, {d: "identicon"}
-            data.avatarAsmall = gravatar.url user.email, {d: "identicon", s:32}
+            data.avatarA = "/user/"+user.name+"/avatar"
+            data.avatarAsmall = data.avatarA+"/32"
           else
-            data.avatarB = gravatar.url user.email, {d: "identicon"}
-            data.avatarBsmall = gravatar.url user.email, {d: "identicon", s:32}
+            data.avatarB = "/user/"+user.name+"/avatar"
+            data.avatarBsmall = data.avatarB + "/32"
 
         # get scenario information, if available
         database.Scenario.findOne

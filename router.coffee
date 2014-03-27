@@ -14,6 +14,7 @@ error = require "./error"
 games = require "./games"
 database = require "./database"
 auth = require "./auth"
+avatar = require "./avatar"
 
 app = express()
 
@@ -74,6 +75,7 @@ games.setupRoutes app
 user.setupRoutes app
 notifications.setupRoutes app
 ajax.setupRoutes app
+avatar.setupRoutes app
 
 app.listen(8080)
 console.log "Server listening at 8080"
