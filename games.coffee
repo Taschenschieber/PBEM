@@ -24,22 +24,25 @@ exports.setupRoutes = (app) ->
   app.get "/games/my/challenges", (req,res) ->
     data = assembleData req,res
     # load challenges from database
-    console.log "TEST0"
     database.Challenge.find
       to: req.user.name
     .populate "scenario"
     .exec (err, challengers) ->
-      console.log "TEST1"
       return error.handle err if err
       data.challengers = challengers || []
-      console.log "TEST2"
       database.Challenge.find
         from: req.user.name
       .populate "scenario"
       .exec (err, challenges) ->
-        console.log "TEST3"
         return error.handle err if err
         data.challenges = challenges || []
+
+        # create fancy dates        
+        for ch in data.challengers
+          ch.fancyDate = moment(ch.sent).fromNow()
+        for ch in data.challenges
+          ch.fancyDate = moment(ch.sent).fromNow()
+        
         res.render "challenges.jade", data
   
   app.get "/games/my/active", (req,res) ->

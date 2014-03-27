@@ -1,72 +1,109 @@
 extends layout
 
 mixin incoming(challengers)
-  each challenger in challengers
+  each ch in challengers
     .panel.panel-default
       .panel-heading
         h3.panel-title
-          Against
-          = challenger.from
+          if ch.scenario
+            = ch.scenario.number
+            | &nbsp;-&nbsp; 
+            = ch.scenario.title
       .panel-body
-        ul
-          li 
-            b Scenario:  
-            if challenger.scenario && challenger.scenario.number
-              strong= challenger.scenario.number + " "
-              if challenger.scenario.title
-                = challenger.scenario.title
-            else
-              | Custom Scenario / DYO
-          li
-            b Time Control: 
-            = challenger.timeControl
-          li
-            b Sent: 
-            = challenger.sent
-          li
-            a(href="/challenges/"+challenger.id+"/accept") Accept 
-            | or 
-            a(href="/challenges/"+challenger.id+"/decline") Decline
-            | ?
-        if challenger.message
-          p The challenger sent you a message:
-          p= challenger.message
+        table.challenges
+          tr
+            td(colspan=2)           
+              | Challenge by 
+              = ch.from
+              | ,&nbsp;
+              = " "+ch.fancyDate || ch.sent
+          tr
+            th(width="*") Your side
+            th(width="*") Opponent's side
+          if ch.whoIsAttacker == "B"
+            tr
+              td Defender
+              td Attacker
+            tr
+              td= ch.scenario.defender.nation
+              td= ch.scenario.attacker.nation
+          else
+            tr
+              td Attacker
+              td Defender
+            tr
+              td= ch.scenario.attacker.nation
+              td= ch.scenario.defender.nation
+               
+          tr
+            td(colspan=2)
+          tr
+            td(colspan=2)
+              bold Time Control:&nbsp;
+              = ch.timeControl
+          tr
+            td(colspan=2)
+              a.btn.btn-primary.active(href="/challenges/"+ch.id+"/accept") Accept 
+              | &nbsp;
+              a.btn.btn-default.active(href="/challenges/"+ch.id+"/decline") Decline
+          if ch.message
+            tr
+              td(colspan=2)= ch.message
 
 mixin outgoing(challenges)
-  each challenge in challenges
+  each ch in challengers
     .panel.panel-default
       .panel-heading
         h3.panel-title
-          Against
-          = challenge.to
+          if ch.scenario
+            = ch.scenario.number
+            | &nbsp;-&nbsp; 
+            = ch.scenario.title
       .panel-body
-        ul
-          li 
-            b Scenario:  
-            if challenge.scenario && challenge.scenario.number
-              strong= challenge.scenario.number +" "
-              if challenge.scenario.title
-                = challenge.scenario.title
-            else
-              | Custom Scenario / DYO
-          li
-            b Time Control: 
-            = challenge.timeControl
-          li
-            b Sent: 
-            = challenge.sent
-          li
-            a(href="/challenges/"+challenge.id+"/takeback") Take back 
-        if challenge.message
-          p The challenger sent you a message:
-          p= challenge.message
+        table.challenges
+          tr
+            td(colspan=2)           
+              | Challenge to 
+              = ch.from
+              | ,&nbsp;
+              = " "+ch.fancyDate || ch.sent
+          tr
+            th(width="*") Your side
+            th(width="*") Opponent's side
+          if ch.whoIsAttacker == "A"
+            tr
+              td Defender
+              td Attacker
+            tr
+              td= ch.scenario.defender.nation
+              td= ch.scenario.attacker.nation
+          else
+            tr
+              td Attacker
+              td Defender
+            tr
+              td= ch.scenario.attacker.nation
+              td= ch.scenario.defender.nation
+               
+          tr
+            td(colspan=2)
+          tr
+            td(colspan=2)
+              bold Time Control:&nbsp;
+              = ch.timeControl
+          tr
+            td(colspan=2)
+              a.btn.btn-warning.active(href="/challenges/"+ch.id+"/takeback") Take back 
+          if ch.message
+            tr
+              td(colspan=2)= ch.message
         
 block secondary-nav
   include secondary-nav-games
   
 block content
   h1 Challenges
-    h2 People challenging you
+    h2 Challenges sent to you
     if (challengers && challengers.length > 0)
         +incoming(challengers)
     else
@@ -76,5 +113,5 @@ block content
           | instead?
           
     if (challenges && challenges.length > 0)
-      h2 Your challenges
+      h2 Challenges sent by you
       +outgoing(challenges)

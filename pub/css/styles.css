@@ -21,7 +21,11 @@ td.active-player {
   text-align: left;
 }
 
-#logs-table, table.messages {
+table.challenges td, table.challenges th {
+  text-align: center;
+}
+
+#logs-table, table.messages, table.challenges {
   width: 100%
 }
 
