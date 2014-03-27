@@ -6,11 +6,13 @@ mixin list(games)
       tr
         td= game.playerA
         td= game.playerB
-        if game.scenario.number
-          td= game.scenario.number
+        if game.scenario && game.scenario.number
+          td
+            strong= game.scenario.number
+            = " - "+(game.scenario.title || "Unknown Scenario")
         else
-          td DYO
-        td: a(href="/game/"+game.id) Details...
+          td Custom Scenario
+        td: a(href="/game/"+game.id) Show Details
 
 block secondary-nav
   include secondary-nav-games

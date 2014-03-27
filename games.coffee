@@ -46,6 +46,7 @@ exports.setupRoutes = (app) ->
       $and: [$or: [{playerA: req.user.name}, {playerB: req.user.name}], result: "ongoing"]
     .populate "scenario"
     .exec (err, games) ->
+      console.log games
       res.send err if (err)
       
       data.games = games
@@ -85,7 +86,7 @@ exports.setupRoutes = (app) ->
           if user.name == game.playerA
             data.avatarA = "/user/"+user.name+"/avatar"
             data.avatarAsmall = data.avatarA+"/32"
-          else
+          if user.name == game.playerB
             data.avatarB = "/user/"+user.name+"/avatar"
             data.avatarBsmall = data.avatarB + "/32"
           
@@ -256,7 +257,7 @@ exports.setupRoutes = (app) ->
         playerA: challenge.from
         playerB: challenge.to
         timeControl: challenge.timeControl
-        scenarioId: challenge.scenarioId
+        scenario: challenge.scenario
       
       game.save (err) ->
         res.send err if err

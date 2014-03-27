@@ -42,9 +42,11 @@ block secondary-nav
   
 block content
   h1
-    = game.scenario.number
-    small= " "+(scenario.title || "Unknown Scenario")
-    //- scenario title should be supplied here
+    if game.scenario && game.scenario.number
+      = game.scenario.number
+      small= " "+(game.scenario.title || "Unknown Scenario")
+    else
+      | Custom Scenario
       
   table.game-header(width="100%")
     tr
