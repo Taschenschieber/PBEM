@@ -134,6 +134,7 @@ notificationSchema = new mongoose.Schema
   action: String # url
   date: 
     type: Date, default: Date.now
+  image: String
   
 exports.Notification = Notification = mongoose.model "Notification", notificationSchema
 

@@ -120,7 +120,7 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false 
+      empty: false
       message: req.body.message
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
@@ -216,14 +216,13 @@ exports.setupRoutes = (app) ->
     
     
     # apparently, data is valid - now write to DB
-    challenge = new database.Challenge {
+    challenge = new database.Challenge
       from: req.user.name
       to: req.body.opponent
       timeControl: req.body.timecontrol
       scenarioId: req.body.scenario.trim().split(" ")[0]
       dyo: req.body.dyo
       message: req.body.message
-    }
     
     #console.log challenge
     
@@ -233,7 +232,12 @@ exports.setupRoutes = (app) ->
         return res.redirect "/error"
 
       # saved the challenge - now, issue a notification to the challenged player
-      database.createNotification challenge.to, "You have been challenged to a match!", "/games/my/challenges", (err) ->
+      notification = new database.Notification
+        username: challenge.to
+        text: challenge.from+" challenged you to play "+challenge.scenarioId+" with him."
+        action: "/games/my/challenges"
+        image: "/user/"+challenge.from+"/avatar/32" #32px big avatar
+      notification.save (err) ->
         console.log(err || "Notification created")
         # all done... hopefully. Worry about asynchronous err handling later.
         # no error handling for notifications, it's not really worth it.
@@ -241,7 +245,7 @@ exports.setupRoutes = (app) ->
   
   app.get "/challenges/:id/accept", (req, res) -> # TODO Authenticate!
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
-      res.render err if (err || not res)
+      res.send err if (err || not res)
       # create a game out of the challenge
       game = new database.Game
         playerA: challenge.from
@@ -252,28 +256,53 @@ exports.setupRoutes = (app) ->
       game.save (err) ->
         res.send err if err
         # send notification
-        database.createNotification challenge.to, req.user.name + " accepted your challenge!", "/game/"+game._id, (err) ->
-          console.log err if err
+        new database.Notification
+          username: challenge.from
+          text: req.user.name + " accepted your challenge."
+          action: "/game/"+game._id
+          image: "/user/"+challenge.to+"/avatar/32"
+        .save (err) ->
+          if err
+            console.log "ERROR (ignored) while writing notification:"
+            console.log err
           
         challenge.remove (err) ->
-          console.log err if err
+          if err
+            console.log "ERROR (ignored) while deleting challenge:"
+            console.log err
         res.redirect "/game/" + game._id
         
 
   app.get "/challenges/:id/decline", (req,res) -> # TODO Authenticate
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
       res.render err if (err || not res)
-      database.createNotification challenge.from, req.user.name + " declined your challenge. :(", "#", (err) ->
-        console.log err if err
+      new database.Notification
+        username: challenge.from
+        text: req.user.name + " declined your challenge."
+        action: "#"
+        image: "/user/"+challenge.to+"/avatar/32"
+      .save (err) ->
+        if err
+          console.log "ERROR (ignored) while saving notification:"
+          console.log err
       challenge.remove (err) ->
-        return res.render err if err
+        if err
+          console.log "ERROR (ignored) while deleting challenge:"
+          console.log err
         res.redirect "/games/my/challenges"
         
   app.get "/challenges/:id/takeback", (req,res) -> # TODO Authenticate
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
       res.render err if (err || not res)
-      database.createNotification challenge.to, req.user.name + " took back his challenge to you.", "#", (err) ->
-        console.log err if err
+      new database.Notification
+        username: challenge.to
+        text: req.user.name + " took back his challenge to you."
+        action: "#"
+        image: "/user/"+challenge.from+"/avatar/32"
+      .save (err) ->
+        if err
+          console.log "ERROR (ignored) while saving notification:"
+          console.log err
       challenge.remove (err) ->
         return res.render err if err
         res.redirect "/games/my/challenges"

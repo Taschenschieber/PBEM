@@ -2,18 +2,25 @@ mixin notifications(notifications)
   ul.dropdown-menu#notifications-menu
     li: a(href="javascript:window.deleteNotifications()") Delete all
     - each notification in notifications
-      li: a(href="/notifications/" + notification._id)= notification.text
+      li
+        //- manual size information just in case the image can't be loaded
+        a(href="/notifications/" + notification._id)
+          img(src=notification.image, width="32px", height="32px", float="left")
+          = notification.text
 
 if(req.notifications && req.notifications.length)
   li
     a.dropdown-toggle#notifications-toggle(href="#", data-toggle="dropdown")
-      | Notifications 
+      span.glyphicon.glyphicon-bullhorn 
+      | &nbsp;
+
       span.badge
         = req.notifications.length
     +notifications(req.notifications)
   
 else
   li
-    a.dropdown-toggle(href="#", data-toggle="dropdown") Notifications
+    a.dropdown-toggle(href="#", data-toggle="dropdown")
+      span.glyphicon.glyphicon-bullhorn 
     ul.dropdown-menu
       li.dropdown-header No new notifications!

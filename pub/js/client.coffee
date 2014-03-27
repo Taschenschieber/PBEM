@@ -1,7 +1,7 @@
 window.deleteNotifications = () ->
 
   $("#notifications-menu").html("<li class='dropdown-header'>No new notifications!</li>")
-  $("#notifications-toggle").html("Notifications")
+  $("#notifications-toggle").html("<span class='glyphicon glyphicon-bullhorn' />")
   
   $.ajax({
     url: "/notifications/delete"

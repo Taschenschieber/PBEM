@@ -28,3 +28,8 @@ td.active-player {
 #logs-table tr#bottom td {
   border-bottom: 2px dotted silver;
 }
+
+li img {
+  margin-right: 20px;
+  vertical-align: middle;
+}
