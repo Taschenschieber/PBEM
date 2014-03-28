@@ -45,14 +45,8 @@ parseMailLowLevel = (mail, done) ->
   stream.on "end", () ->
     imap.deleteMessage mail.UID, (err) ->
       done err
-  
-  
-imap = inbox.createConnection no, "imap.gmail.com", 
-  secureConnection: true
-  auth: config.email.auth 
-  
-imap.on "connect", () ->
-  console.log "Connected to IMAP server"
+
+syncMailbox = () ->
   imap.openMailbox "INBOX", {readOnly: false}, (err, info) ->
     if err
       console.log err
@@ -63,7 +57,19 @@ imap.on "connect", () ->
       console.log "Retrieved #{messages.length} messages"
       for message in messages
         parseMailLowLevel message, (err2) ->
-          console.log err2 if err2
+          console.log err2 if err2      
+  
+imap = inbox.createConnection no, "imap.gmail.com", 
+  secureConnection: true
+  auth: config.email.auth 
+  
+imap.on "connect", () ->
+  console.log "Connected to IMAP server"
+  syncMailbox()
+          
+imap.on "new", () ->
+  console.log "Received new e-mail"
+  syncMailbox()
     
 console.log "Establishing IMAP connection..."
 imap.connect()
