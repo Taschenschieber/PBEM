@@ -1,0 +1,29 @@
+extend ../layout
+
+mixin ratingLine(user, i)
+  tr
+    td= i
+    td: img(src="/user/#{user.name}/avatar/32")
+    td: a(href="/user/"+user.name)= user.name
+    td
+      if user.rating.games >= 10
+        = "(<span style='color:grey'>"+user.rating.points+"</span>)"
+      else
+        = user.rating.points
+
+block secondary-nav
+  include secondary-nav-users
+  
+block content
+  h1 Best players
+  h2 Highest ratings
+  if bestRatings && bestRatings.length
+  table.table
+    tr
+      th #
+      th(colspan=2) Player
+      th Rating
+    - var i = 1
+    each user in bestRatings
+      +ratingLine(user, i)
+      - i++

@@ -26,7 +26,10 @@ block content
         th Rated games played
         td= user.rating.games
       tr
-        th Rating
+        th 
+          | Elo rating&nbsp;(
+          a(href="/help/rating") What is this?
+          | )
         td
           if user.rating.games <= 10
             span(style="color:grey;")

@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  h1 Ratings
+  p Every player on this site receives a rating, based on how well he plays. This rating is calculated with the Elo algorithm. Calculation happens automatically every time you finish a game.
+  p Stronger players are given higher ratings, with 1000 points denoting an average player. You can approximately calculate your chances of a win: About 200 points of difference mean a 75% chance of the stronger player winning, 400 points of difference mean a 95% chance.
+  p Losing against a stronger opponent or winning against a weaker opponent will hardly impact your rating. Winning against a stronger opponent will raise it a lot, as will losing against a weaker opponent.
+  p Ratings are always symmetrical - if you receive 10 points for winning a game, your opponent loses 10 points. Ratings are capped at 100 points, though.
+  p Until you have played at least 10 games, your rating is called "provisional" because there isn't enough data yet to calculate a reliable rating. Provisional ratings are shown in brackets and in grey across the site.
+  p 
+    | This system is based on the work of the late Arpad Elo. You can read about the algorithms used in all detail on 
+    a(href="http://en.wikipedia.org/wiki/Elo_rating_system", target="_blank") Wikipedia
+    | .

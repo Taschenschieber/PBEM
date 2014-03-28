@@ -10,6 +10,7 @@
 # /user/:name - profile for :name
 # /user/message/:id - read message
 # /user/message/:id/delete - delete message from inbox/outbox
+# /users/best - High Score List
 
 moment = require "moment"
 flash = require "connect-flash"
@@ -108,4 +109,18 @@ exports.setupRoutes = (app) ->
         req.user.outbox.push message
         req.user.save (err) ->
           console.log err if err
+          
+  app.get "/users/best", (req,res) ->
+    data = {req: req, res: res}
+    database.User
+    .find {}
+    .sort "-rating"
+    .limit 10
+    .select "name rating password" # NOTE not selecting password causes error
+    .exec (err, bestRatings) ->
+      console.log bestRatings
+      return error.handle err if err
+      data.bestRatings = bestRatings
+      
+      res.render "user/best.jade", data
         
