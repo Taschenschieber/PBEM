@@ -105,3 +105,11 @@ exports.getActiveUser = (done) ->
 passport.deserializeUser (user, done) ->
   User.findOne {name: user}, (err, user) ->
     done err, user
+    
+exports.loggedIn = (req, res, next) ->
+  if req.user
+    next()
+  else
+    req.flash "error", "You need to be logged in to perform this 
+      operation. Please log in or sign up."
+    res.redirect "/signup"

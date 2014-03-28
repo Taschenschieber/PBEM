@@ -8,23 +8,26 @@
 # /users/messenger - Messenger. Duh.
 # /users/messenger/do/send - send a message. POST.
 # /user/:name - profile for :name
+# /user/me - profile for logged in user (editable)
 # /user/message/:id - read message
 # /user/message/:id/delete - delete message from inbox/outbox
 # /users/best - High Score List
 
-moment = require "moment"
 flash = require "connect-flash"
+moment = require "moment"
+passport = require "passport"
 
+auth = require "./auth"
 database = require "./database"
 error = require "./error"
 avatar = require "./avatar"
 
 exports.setupRoutes = (app) ->
-  app.get "/users", (req, res) ->
+  app.get "/users", auth.loggedIn, (req, res) ->
     data = {req:req,res:res}
     res.render "user/overview.jade", data
     
-  app.get "/users/messenger", (req,res) ->
+  app.get "/users/messenger", auth.loggedIn, (req,res) ->
     data = {req:req,res:res}
     # fancy dates
     for msg in req.user.inbox
@@ -34,7 +37,7 @@ exports.setupRoutes = (app) ->
 
     res.render "user/messenger.jade", data
 
-  app.get "/user/:name", (req,res) ->
+  app.get "/user/:name", auth.loggedIn, (req,res) ->
     data = {req:req,res:res}
     
     database.User.findOne
@@ -46,7 +49,11 @@ exports.setupRoutes = (app) ->
       data.avatar = "/user/"+user.name+"/avatar"
       res.render "user/profile_public.jade", data
       
-  app.get "/user/message/:msgid", (req, res) ->
+  app.get "/user/me", auth.loggedIn, (req,res) ->
+    data: {req:req, res: res, user: req.user}
+    res.render "user/me.jade", data
+      
+  app.get "/user/message/:msgid", auth.loggedIn, (req, res) ->
     data = {req:req,res:res}
     # try and find message
     for msg in req.user.inbox.concat(req.user.outbox)
@@ -61,7 +68,7 @@ exports.setupRoutes = (app) ->
     res.redirect "/users/messenger"
     
     
-  app.get "/user/message/:msgid/delete", (req,res) ->
+  app.get "/user/message/:msgid/delete", auth.loggedIn, (req,res) ->
     saveChanges = (user) ->
       user.save (err) ->
         return error.handle err if err
@@ -86,7 +93,7 @@ exports.setupRoutes = (app) ->
     res.redirect "/users/messenger"
     
       
-  app.post "/users/messenger/do/send", (req, res) ->
+  app.post "/users/messenger/do/send", auth.loggedIn, (req, res) ->
     message = new database.Message # TODO Validate!
       to: req.body.to
       from: req.user.name
@@ -110,7 +117,7 @@ exports.setupRoutes = (app) ->
         req.user.save (err) ->
           console.log err if err
           
-  app.get "/users/best", (req,res) ->
+  app.get "/users/best", auth.loggedIn, (req,res) ->
     data = {req: req, res: res}
     database.User
     .find {}
