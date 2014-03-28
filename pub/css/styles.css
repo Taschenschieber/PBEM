@@ -38,6 +38,10 @@ li img {
   vertical-align: middle;
 }
 
-table.stats td,th {
+table.stats td, table.stats th {
+  padding: 5px;
+}
+
+table.own-profile td, table.own-profile th {
   padding: 5px;
 }

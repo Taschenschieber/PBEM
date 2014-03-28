@@ -36,6 +36,10 @@ exports.setupRoutes = (app) ->
       msg.fancyDate = moment(msg.sent).fromNow()
 
     res.render "user/messenger.jade", data
+    
+  app.get "/user/me", auth.loggedIn, (req,res) ->
+    data = {req:req, res: res, user: req.user}
+    res.render "user/me.jade", data
 
   app.get "/user/:name", auth.loggedIn, (req,res) ->
     data = {req:req,res:res}
@@ -43,15 +47,11 @@ exports.setupRoutes = (app) ->
     database.User.findOne
       name: req.params.name
     , (err, user) -> 
-      return error.handle(req,res,err) if err
-      return error.handle(req,res,"No such user!") unless user
+      return error.handle(err, req, res) if err
+      return error.handle("No such user!", req, res) unless user
       data.user = user
       data.avatar = "/user/"+user.name+"/avatar"
       res.render "user/profile_public.jade", data
-      
-  app.get "/user/me", auth.loggedIn, (req,res) ->
-    data: {req:req, res: res, user: req.user}
-    res.render "user/me.jade", data
       
   app.get "/user/message/:msgid", auth.loggedIn, (req, res) ->
     data = {req:req,res:res}

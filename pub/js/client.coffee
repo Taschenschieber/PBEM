@@ -68,6 +68,35 @@ window.selectUser = (user) ->
   $("#opponent").val(user)
   return # NOTE: Explicit "return" is necessary to prevent unwanted redirect
   
+  
+# profile editing
+window.editProfile = (which) ->
+  text = $(which).html()
+  if text == "No data entered."
+    text = ""
+  
+  $(which).html "<input type='text' id='temp' value='#{text}' />"
+  $(which+"-button").html "
+      <a href='javascript:window.editProfileDone(#{'"'+which+'"'});'>
+      <span class='glyphicon glyphicon-ok' /></a>"
+  
+  return
+  
+window.editProfileDone = (which) ->
+  field = which.substr 1, which.length-1
+  text = $(which+" input").val()
+  if text == ""
+    return
+  
+  $.ajax "/ajax/profile/"+encodeURI(field)+"/"+encodeURI(text)
+  .done (response, status) ->
+    $(which).html response
+    $(which+"-button").html "
+      <a href='javascript:window.editProfile(#{'"'+which+'"'});'>
+      <span class='glyphicon glyphicon-pencil' /></a>"
+  return
+  
+  
 ###
   #  tabbing
 ###

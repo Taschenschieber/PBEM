@@ -3,7 +3,7 @@ extend ../layout
 mixin ratingLine(user, i)
   tr
     td= i
-    td: img(src="/user/#{user.name}/avatar/32")
+    td(width="32px"): img(src="/user/#{user.name}/avatar/32")
     td: a(href="/user/"+user.name)= user.name
     td
       if user.rating.games >= 10
