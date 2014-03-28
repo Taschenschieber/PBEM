@@ -19,5 +19,22 @@ block content
       tr
         td: a(href="/games/challenge?to="+user.name) Challenge this User
         
+        
+    h1 Statistics    
+    table.stats
+      tr
+        th Rated games played
+        td= user.rating.games
+      tr
+        th Rating
+        td
+          if user.rating.games <= 10
+            span(style="color:grey;")
+              | (
+              =user.rating.points
+              | )
+          else
+            span= user.rating.points
+        
 
     //- TODO Add admin etc status

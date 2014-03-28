@@ -74,4 +74,7 @@ window.selectUser = (user) ->
 $("a[data-toggle='tab']").on "shown.bs.tab", (event) ->
   event.preventDefault
   $(event.target).tab("show")
-  
+
+
+# setup stuff
+$(".help").tooltip();  

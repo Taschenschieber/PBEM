@@ -37,3 +37,7 @@ li img {
   margin-right: 20px;
   vertical-align: middle;
 }
+
+table.stats td,th {
+  padding: 5px;
+}

@@ -89,4 +89,6 @@
     return $(event.target).tab("show");
   });
 
+  $(".help").tooltip();
+
 }).call(this);
