@@ -18,7 +18,8 @@
     "nodemailer": "*",
     "gravatar": "*",
     "moment": "*",
-    "mailparser": "*"
+    "mailparser": "*",
+    "inbox": "*"
    },
   
   "devDependencies": {
