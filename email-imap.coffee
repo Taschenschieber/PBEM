@@ -42,7 +42,9 @@ parseMailLowLevel = (mail, done) ->
   return done new Error "No stream" unless stream
   
   stream.pipe mailparser, {end: true}
-  done false
+  stream.on "end", () ->
+    imap.deleteMessage mail.UID, (err) ->
+      done err
   
   
 imap = inbox.createConnection no, "imap.gmail.com", 
@@ -51,7 +53,7 @@ imap = inbox.createConnection no, "imap.gmail.com",
   
 imap.on "connect", () ->
   console.log "Connected to IMAP server"
-  imap.openMailbox "INBOX", (err, info) ->
+  imap.openMailbox "INBOX", {readOnly: false}, (err, info) ->
     if err
       console.log err
     console.log "#{info.count} new messages in inbox"
