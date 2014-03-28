@@ -181,6 +181,15 @@ userSchema = new mongoose.Schema
     publicEmail: Boolean
     xmpp: String
   
+  rating:
+    points:
+      type: Number
+      default: 1000
+    games: # used to determine if rating is provisional
+      type: Number 
+      default: 0
+      
+  
 # encryption 
 
 userSchema.pre "save", (next) ->

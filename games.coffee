@@ -12,6 +12,7 @@ moment = require "moment"
 avatar = require "./avatar"
 common = require "./common"
 database = require "./database"
+elo = require "./elo"
 email = require "./email"
 error = require "./error"
 
@@ -123,6 +124,12 @@ exports.setupRoutes = (app) ->
           req.flash "error", "There was an error while writing to the database."
         else
           req.flash "info", "You resigned from this game."
+        
+        loadPlayersAndUpdateRatings game.playerA, game.playerB, (result == "winA"), (err) ->
+          if err
+            console.log "ERROR while calculating new ratings"
+            console.log err
+        
         res.redirect "/game/"+req.params.id
       
       
@@ -133,7 +140,7 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false
+      empty: false 
       message: req.body.message
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
@@ -372,3 +379,44 @@ getPhaseByID = (id) ->
       b = "black"
       
   return "<span style='color:"+b+"; font-weight: bold;'>"+a+"</span>"
+
+loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
+  database.User.findOne
+    name: nameA
+  .select "rating password" # not selecting password apparently causes crash
+  .exec (err, userA) ->
+    return done err if err
+    return done new Error "No such user: "+nameA unless userA
+    database.User.findOne
+      name: nameB
+    .select "rating password"
+    .exec (err, userB) ->
+      return done err if err
+      return done new Error "No such user: "+nameB unless userB
+      ratingAdjustments userA, userB, aWon, (err) ->
+        done err
+
+  
+# aWon = true when player A won
+ratingAdjustments = (playerA, playerB, aWon, done) ->
+  # 1000 is default rating
+  ratingA = playerA.rating?.points || 1000
+  ratingB = playerB.rating?.points || 1000
+  
+  newRatingA = elo.newr ratingA, ratingB, aWon
+  newRatingB = elo.newr ratingB, ratingA, !aWon
+  
+  console.log "Rating change: #{ratingA} to #{newRatingA}"
+  console.log "Rating change: #{ratingB} to #{newRatingB}"
+  
+  playerA.rating.points = newRatingA
+  playerA.rating.games = (playerA.rating.games || 1) + 1
+  
+  playerB.rating.points = newRatingB
+  playerB.rating.games = (playerB.rating.games || 1) + 1
+  
+  playerA.save (err) ->
+    playerB.save (err2) ->
+      done err || err2
+  
+  
