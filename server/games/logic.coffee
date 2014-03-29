@@ -6,7 +6,11 @@
 #
 # No routes are defined in this file.
 
+fs = require "fs"
+mkdirp = require "mkdirp"
+
 database = require "../database"
+email = require "../email"
 
 mongoose = database.mongoose
 
@@ -160,7 +164,70 @@ exports.ratingAdjustments = (playerA, playerB, aWon, done) ->
   playerA.save (err) ->
     playerB.save (err2) ->
       done err || err2
-
+      
+exports.addLog = (log, file, game, user, done) -> 
+  unless log and game and file and user and done
+    return done new Error "Illegal parameters"
+      
+  game.logs.push log
+  previousPlayer = game.whoseTurn || "" # needed to revert after error
+  if(user.name == game.playerA)
+    game.whoseTurn = "B"
+  else if (user.name == game.playerB)
+    game.whoseTurn = "A"
+  else
+    return done new Error "User has no access rights."
+  
+  game.save (err) ->
+    return done err if err
+    console.log log._id
+    path = "./pub/logfiles/#{game._id}/#{log._id}.vlog"
+    console.log "Saving to: ", path
+    console.log "Tempfile: ", file
+    fs.readFile file, (err, data) ->
+      return done err if err
+      console.log "Making dir: ", "./pub/logfiles/"+game._id
+      mkdirp "./pub/logfiles/"+game._id, (err) ->
+        if err
+          # oh bollocks! Delete log from DB to ensure consistency
+          # well... eventual consistency
+          if game.logs.indexOf log >= 0
+            game.logs.splice(game.logs.indexOf(log), 1)
+            
+          game.whoseTurn = previousPlayer
+          game.save (err) ->
+            #do nothing
+            console.log err if err
+          return done err
+        fs.writeFile path, data, (err2) ->
+          if err2
+            # oh bollocks! Delete log from DB to ensure consistency
+            # well... eventual consistency
+            if game.logs.indexOf log >= 0
+              game.logs.splice(game.logs.indexOf(log), 1)
+              
+            game.whoseTurn = previousPlayer
+            game.save (err) ->
+              #do nothing
+              console.log " "
+            return done err2
+          else
+            email.sendLogMail game, (err, response) ->
+              console.log err if err
+              console.log "Mail transport with response", response if response
+            notificationTarget = game.playerA
+            if game.whoseTurn == "B"
+              notificationTarget = game.playerB
+            new database.Notification
+              username: notificationTarget
+              text: "It's your turn in #{game.scenario.title}!"
+              action: "/game/#{game.id}"
+              image: "/avatar/#{user}"
+            .save (err) ->
+              console.log err if err # non-blocking error
+              
+            done false
+              
 # Calculate new rating
 exports.newElo = (own, opponent, won) ->
   Math.floor own + kFactor(own)*(won - exp(own, opponent)), 100

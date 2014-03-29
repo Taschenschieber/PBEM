@@ -186,7 +186,6 @@ exports.setupRoutes = (app) ->
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
     
-    # TODO move this to logic
     database.Game.findOne {_id: req.params.id}
       .populate "scenario" # needed for e-mail handler
       .exec (err, game) ->
@@ -197,61 +196,13 @@ exports.setupRoutes = (app) ->
         unless(req?.user?.name? and (req.user.name == game.playerA || req.user.name == game.playerB))
           return error.handle(new Error("You are not allowed to post logs to this game."))
           
-        game.logs.push log
-        previousPlayer = game.whoseTurn || "" # needed to revert after error
-        if(req.user.name == game.playerA)
-          game.whoseTurn = "B"
-        else
-          game.whoseTurn = "A"
-        
-        game.save (err) ->
-          return res.send err if err
-          console.log log._id
-          path = "./pub/logfiles/#{game._id}/#{log._id}.vlog"
-          console.log "Saving to: ", path
-          console.log "Tempfile: ", req.files.logfile.path
-          fs.readFile req.files.logfile.path, (err, data) ->
-            return res.send err if err
-            console.log "Making dir: ", "./pub/logfiles/"+game._id
-            mkdirp "./pub/logfiles/"+game._id, (err) ->
-              if err
-                # oh bollocks! Delete log from DB to ensure consistency
-                # well... eventual consistency
-                if game.logs.indexOf log >= 0
-                  game.logs.splice(game.logs.indexOf(log), 1)
-                  
-                game.whoseTurn = previousPlayer
-                game.save (err) ->
-                  #do nothing
-                  console.log " "
-                return res.send err
-              fs.writeFile path, data, (err2) ->
-                if err2
-                  # oh bollocks! Delete log from DB to ensure consistency
-                  # well... eventual consistency
-                  if game.logs.indexOf log >= 0
-                    game.logs.splice(game.logs.indexOf(log), 1)
-                    
-                  game.whoseTurn = previousPlayer
-                  game.save (err) ->
-                    #do nothing
-                    console.log " "
-                  return res.send err2
-                else
-                  email.sendLogMail game, (err, response) ->
-                    console.log err if err
-                    console.log "Mail transport with response", response if response
-                  notificationTarget = game.playerA
-                  if game.whoseTurn == "B"
-                    notificationTarget = game.playerB
-                  new database.Notification
-                    username: notificationTarget
-                    text: "It's your turn in #{game.scenario.title}!"
-                    action: "/game/#{game.id}"
-                    image: "/avatar/#{req.user.name}"
-                  .save (err) ->
-                    console.log err if err
-                  res.redirect "/game/" + game._id
+        # the magic happens here 
+        logic.addLog log, req.files?.logfile?.path, game, req.user, (err) ->
+          if err
+            return error.handle err
+          req.flash "info", "Your log was successfully uploaded."
+          console.log "TEST"
+          res.redirect "/game/#{game.id}"
             
             
   # automatically download entire game, specified by id
