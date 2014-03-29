@@ -8,7 +8,7 @@ mixin logs(game)
           th(colspan=20) No actions taken
       tr
         th(colspan=20)
-          a(href="/logfiles/"+game._id+"/"+game.logs[i].id)
+          a(href="/logfiles/"+game._id+"/"+game.logs[i].id+".vlog")
             span.glyphicon.glyphicon-floppy-save 
           | &nbsp;Log #
           = i
@@ -119,7 +119,7 @@ block content
           a(href="/user/"+activePlayer)= activePlayer
           | 's turn to move.
       p
-        a.btn.btn-info.active(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id) Download latest log
+        a.btn.btn-info.active(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id+".vlog") Download latest log
         | &nbsp;
         if game.result == "ongoing"
           if isactive

@@ -57,19 +57,19 @@ exports.sendLogMail = (game, callback) ->
       
 
       <ul>
-      <li><a href=http://#{config.server.url}/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}>
+      <li><a href='http://#{config.server.url}/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}.vlog'>
           Download the log file</a></li>
-      <li><a href=http://#{config.server.url}/game/#{game._id}>Open game in browser</a></li>
+      <li><a href='http://#{config.server.url}/game/#{game._id}'>Open game in browser</a></li>
       </ul>
     "
     
     attachments = []
     if user.notifications?.onNewLogWithLog
       text += "<p>Additionally, the new log file is also attached to this e-mail.</p>"
-      attachments = [
+      attachments.push
         fileName: "latest.vlog"
-        filePath: "/pub/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}"
-      ]
+        filePath: __dirname + "/pub/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}.vlog"
+      
       
     text += "<p>You can either upload your log file on the web site linked 
       above, or you can simply reply to this e-mail with the log file attached.

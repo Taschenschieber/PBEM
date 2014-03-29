@@ -166,7 +166,7 @@ exports.setupRoutes = (app) ->
         game.save (err) ->
           return res.send err if err
           console.log log._id
-          path = __dirname + "/pub/logfiles/"+game._id+"/"+log._id
+          path = __dirname + "/pub/logfiles/#{game._id}/#{log._id}.vlog"
           console.log "Saving to: ", path
           console.log "Tempfile: ", req.files.logfile.path
           fs.readFile req.files.logfile.path, (err, data) ->
@@ -364,7 +364,7 @@ getPhaseByID = (id) ->
       b = "violet"
     when 5 
       a = "AFPh"
-      b = "violet"
+      b = "orange"
     when 6 
       a = "RtPh"
       b = "black"
