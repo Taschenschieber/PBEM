@@ -30,6 +30,8 @@ block secondary-nav
 block content
   if req.user.name == name
     h1 Your #{state} games
+  else if watchlist
+    h1 Your watched games
   else if name == ""
     h1 All #{state} games
   else

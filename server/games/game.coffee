@@ -40,12 +40,16 @@ exports.setupRoutes = (app) ->
       query.$or = [{playerA: name}, {playerB: name}] 
     else if req.params.name == "all"
       data.name = ""
+    else if req.params.name == "watchlist"
+      data.name = "watchlist"
+      query.kibitzers = req.user?.id
+      data.watchlist = true
     else
       data.name = name = req.params.name
       query.$or = [{playerA: name}, {playerB: name}] 
     
     data.state = "archived"
-    unless req.params.state == "archive"
+    unless (req.params.state == "archive" || data.watchlist)
       query["result"] = "ongoing"
       data.state = "active"
 
@@ -177,7 +181,7 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false 
+      empty: false
       message: req.body.message
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
