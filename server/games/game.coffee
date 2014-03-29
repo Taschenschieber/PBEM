@@ -17,6 +17,7 @@ ZIP = require "adm-zip" # NOTE: Does not currently work with official version
                         # of adm-zip. See package.json
 
 avatar = require "../avatar"
+auth = require "../auth"
 common = require "../common"
 database = require "../database"
 email = require "../email"
@@ -24,14 +25,18 @@ error = require "../error"
 logic = require "./logic"
 
 exports.setupRoutes = (app) ->
-  app.get "/games", (req,res) -> res.redirect "/games/me/active"
+  app.get "/games", (req,res) ->
+    if req.user
+      res.redirect "/games/me/active"
+    else
+      res.redirect "/games/all/active"
   
   app.get "/games/:name/:state", (req,res) ->
     data = assembleData req, res
     query = {}
     
     if req.params.name == "me"
-      data.name = name = req.user.name
+      data.name = name = req.user?.name
       query.$or = [{playerA: name}, {playerB: name}] 
     else if req.params.name == "all"
       data.name = ""
@@ -53,10 +58,7 @@ exports.setupRoutes = (app) ->
       res.send err if (err)
       
       data.games = games
-      res.render "games/list.jade", data
-  
-  app.get "/games/:name/archive", (req, res) ->
-    
+      res.render "games/list.jade", data    
   
   
   app.get "/game/:id", (req,res) ->
@@ -76,6 +78,9 @@ exports.setupRoutes = (app) ->
         data.activePlayer = ""
       
       data.bulkName = getBulkFileName game
+      
+      if req.user.name in [game.playerA, game.playerB]
+        data.ownGame = true
       
       # do some date formatting
       for log in game.logs
@@ -98,9 +103,49 @@ exports.setupRoutes = (app) ->
             data.avatarBsmall = data.avatarB + "/32"
           
           res.render "games/game.jade", data
+          
+  app.get "/game/:id/kibitz", auth.loggedIn, (req, res) ->
+    database.Game.findOne
+      _id: req.params.id
+    .select "kibitzers"
+    .exec (err, game) ->
+      return error.handle err if err
+      unless game
+        console.log "Game not found: ", req.params.id
+        req.flash "error", "The game you want to watch does not exist."
+        return res.redirect "/game/#{req.params.id}"
+      unless game.kibitzers
+        game.kibitzers = []
+      unless req.user.id in game.kibitzers
+        game.kibitzers.push req.user.id
+      
+      game.save (err) ->
+        return error.handle err if err
+        req.flash "info", "You are now watching this game."
+        res.redirect "/game/#{req.params.id}"
+        
+  app.get "/game/:id/unkibitz", auth.loggedIn, (req, res) ->
+    database.Game.findOne
+      _id: req.params.id
+    .select "kibitzers"
+    .exec (err, game) ->
+      return error.handle err if err
+      unless game
+        console.log "Game not found: ", req.params.id
+        req.flash "error", "The game you want to stop watching does not exist."
+        return res.redirect "/game/#{req.params.id}"
+      unless game.kibitzers
+        game.kibitzers = []
+      while req.user.id in game.kibitzers
+        game.kibitzers.splice(game.kibitzers.indexOf(req.user.id), 1)
+        
+      game.save (err) ->
+        return error.handle err if err
+        req.flash "info", "You are no longer watching this game."
+        res.redirect "/game/#{req.params.id}"
 
           
-  app.get "/game/:id/resign", (req, res) ->
+  app.get "/game/:id/resign", auth.loggedIn, (req, res) ->
     game = database.Game.findOne
       _id: req.params.id
     .exec (err, game) ->
@@ -125,10 +170,10 @@ exports.setupRoutes = (app) ->
         
         res.redirect "/game/"+req.params.id
         
-  app.get "/game/:id/upload", (req,res) ->
+  app.get "/game/:id/upload", auth.loggedIn, (req,res) ->
     res.render "games/upload.jade", assembleData(req, res)
   
-  app.post "/game/:id/upload/do", (req,res) ->
+  app.post "/game/:id/upload/do", auth.loggedIn, (req,res) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
@@ -203,19 +248,6 @@ exports.setupRoutes = (app) ->
                   .save (err) ->
                     console.log err if err
                   res.redirect "/game/" + game._id
-                  
-                  
-  app.get "/games/world/active/", (req,res) ->
-    data = assembleData req, res
-    database.Game.find {active: true}
-         #.sort "-started"
-         #.skip (req.params.page-1)*10
-         #.limit 10
-         .exec (err, games) ->
-            return res.send err if err
-            data.games = games
-            console.log games
-            res.render "allGames.jade", data
             
             
   # automatically download entire game, specified by id
