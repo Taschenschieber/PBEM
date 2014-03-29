@@ -1,0 +1,19 @@
+mixin item(name, url, bullet)
+  if req.url.indexOf(url) >= 0
+    li.active
+      a(href=url)
+        = name
+        span.badge.pull-right= bullet
+  else
+    li
+      a(href=url)= name 
+        span.badge.pull-right= bullet
+
+ul.nav.nav-pills.nav-stacked
+  +item("My Games", "/games/me/active", req.bullets.games)
+  +item("My Archive", "/games/me/archive", "")
+  +item("My Challenges", "/challenges/list", req.bullets.challenges)
+  +item("Ongoing Games","/games/all/active", "")
+  +item("Archived Games", "/games/all/archive", "")
+  +item("Send Challenge", "/challenges/send", "")
+  +item("Find Opponents", "/lfg", "")

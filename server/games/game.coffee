@@ -24,20 +24,39 @@ error = require "../error"
 logic = require "./logic"
 
 exports.setupRoutes = (app) ->
-  app.get "/games", (req,res) -> res.render("listActiveGames.jade", assembleData(req,res))
+  app.get "/games", (req,res) -> res.redirect "/games/me/active"
   
-  app.get "/games/my/active", (req,res) ->
+  app.get "/games/:name/:state", (req,res) ->
     data = assembleData req, res
-    database.Game.find 
-      $and: [$or: [{playerA: req.user.name}, {playerB: req.user.name}], result: "ongoing"]
+    query = {}
+    
+    if req.params.name == "me"
+      data.name = name = req.user.name
+      query.$or = [{playerA: name}, {playerB: name}] 
+    else if req.params.name == "all"
+      data.name = ""
+    else
+      data.name = name = req.params.name
+      query.$or = [{playerA: name}, {playerB: name}] 
+    
+    data.state = "archived"
+    unless req.params.state == "archive"
+      query["result"] = "ongoing"
+      data.state = "active"
+
+    console.log query
+    database.Game.find query
     .populate "scenario"
+    .select "_id playerA playerB scenario activePlayer whoIsAttacker whoseTurn result"
     .exec (err, games) ->
       console.log games
       res.send err if (err)
       
       data.games = games
-      res.render "mygames.jade", data
+      res.render "games/list.jade", data
   
+  app.get "/games/:name/archive", (req, res) ->
+    
   
   
   app.get "/game/:id", (req,res) ->

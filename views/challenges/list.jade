@@ -1,4 +1,4 @@
-extends layout
+extends ../layout
 
 mixin incoming(challengers)
   each ch in challengers
@@ -99,19 +99,21 @@ mixin outgoing(challenges)
               td(colspan=2)= ch.message
         
 block secondary-nav
-  include secondary-nav-games
+  include ../games/secondary-nav-games
   
 block content
   h1 Challenges
+    a(name="in")
     h2 Challenges sent to you
     if (challengers && challengers.length > 0)
         +incoming(challengers)
     else
         p 
           | You do not have any open challenges! Maybe you would like to 
-          a(href="/games/challenge") challenge someone yourself 
+          a(href="/challenges/send") challenge someone yourself 
           | instead?
           
     if (challenges && challenges.length > 0)
+      a(name="out")
       h2 Challenges sent by you
       +outgoing(challenges)

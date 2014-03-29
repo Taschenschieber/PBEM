@@ -20,9 +20,8 @@ email = require "../email"
 error = require "../error"
 
 exports.setupRoutes = (app) ->
-  app.get "/games/challenge", (req,res) -> res.render("issueChallenge.jade", assembleData(req,res))
-  app.get "/games/challenge/success", (req,res) -> res.render("challengeIssued.jade", assembleData(req,res))
-  app.get "/games/my/challenges", (req,res) ->
+  app.get "/challenges/send", (req,res) -> res.render("challenges/send.jade", assembleData(req,res))
+  app.get "/challenges/list", (req,res) ->
     data = assembleData req,res
     # load challenges from database
     database.Challenge.find
@@ -44,14 +43,14 @@ exports.setupRoutes = (app) ->
         for ch in data.challenges
           ch.fancyDate = moment(ch.sent).fromNow()
         
-        res.render "challenges.jade", data
+        res.render "challenges/list.jade", data
         
   #actual logic
-  app.post "/do/games/challenge/issue", (req,res) -> 
+  app.post "/challenges/send/do", (req,res) -> 
     # validate stuff
     failed = no
     if not req.body.opponent?
-      failed = yes
+      failed = yes 
       req.flash "error", "You have to select an opponent."
       # TODO worry about if the opponent actually exists
     if not req.body.timecontrol?
@@ -95,7 +94,7 @@ exports.setupRoutes = (app) ->
         console.log(err || "Notification created")
         # all done... hopefully. Worry about asynchronous err handling later.
         # no error handling for notifications, it's not really worth it.
-      res.redirect("/games/challenge/success")
+      res.redirect("/challenges/list#out")
   
   app.get "/challenges/:id/accept", (req, res) -> # TODO Authenticate!
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->

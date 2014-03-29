@@ -1,13 +1,13 @@
-extend layout
+extend ../layout
 
 block secondary-nav
-  include secondary-nav-games
+  include ../games/secondary-nav-games
 
 block content
   h1 Issue a challenge
   p This page allows you to issue a challenge to another user. The user can review the challenge and accept or decline it.
   p Challenges can be taken back until they are accepted.
-  form(method="post", action="/do/games/challenge/issue", autocomplete="off")
+  form(method="post", action="/challenges/send/do", autocomplete="off")
       .form-group#opponent-area
         label Opponent
         input.form-control#opponent(type="text", name="opponent", onkeypress="javascript:window.opponent();", autocomplete="off")

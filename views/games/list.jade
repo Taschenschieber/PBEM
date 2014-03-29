@@ -1,4 +1,4 @@
-extends layout.jade
+extends ../layout.jade
 
 mixin list(games)
   table.table
@@ -18,6 +18,14 @@ block secondary-nav
   include secondary-nav-games
   
 block content
-  h1 Your games
+  if req.user.name == name
+    h1 Your #{state} games
+  else if name == ""
+    h1 All #{state} games
+  else
+    h1 #{name}'s #{state} games
+    
   if games && games.length > 0
     +list(games)
+  else
+    p No games match the criteria.
