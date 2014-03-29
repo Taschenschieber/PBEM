@@ -1,9 +1,12 @@
 # (c) 2014 Stephan Hillebrand
 #
-# This file is responsible for handling everything related to creating, playing
-# and watching games.
+# This file acts as controller for all routes in /game and /games, except for
+# those related to challenges. 
 #
-# TODO Make nice route list
+# There might be some restructuring soon to make paths more consistent.
+#
+# Routes defined in this file:
+#
 
 mkdirp = require "mkdirp"
 fs = require "fs"
@@ -13,43 +16,15 @@ tmp = require "tmp"
 ZIP = require "adm-zip" # NOTE: Does not currently work with official version
                         # of adm-zip. See package.json
 
-avatar = require "./avatar"
-common = require "./common"
-database = require "./database"
-elo = require "./elo"
-email = require "./email"
-error = require "./error"
-
-
+avatar = require "../avatar"
+common = require "../common"
+database = require "../database"
+email = require "../email"
+error = require "../error"
+logic = require "./logic"
 
 exports.setupRoutes = (app) ->
-  #static pages
   app.get "/games", (req,res) -> res.render("listActiveGames.jade", assembleData(req,res))
-  app.get "/games/challenge", (req,res) -> res.render("issueChallenge.jade", assembleData(req,res))
-  app.get "/games/challenge/success", (req,res) -> res.render("challengeIssued.jade", assembleData(req,res))
-  app.get "/games/my/challenges", (req,res) ->
-    data = assembleData req,res
-    # load challenges from database
-    database.Challenge.find
-      to: req.user.name
-    .populate "scenario"
-    .exec (err, challengers) ->
-      return error.handle err if err
-      data.challengers = challengers || []
-      database.Challenge.find
-        from: req.user.name
-      .populate "scenario"
-      .exec (err, challenges) ->
-        return error.handle err if err
-        data.challenges = challenges || []
-
-        # create fancy dates        
-        for ch in data.challengers
-          ch.fancyDate = moment(ch.sent).fromNow()
-        for ch in data.challenges
-          ch.fancyDate = moment(ch.sent).fromNow()
-        
-        res.render "challenges.jade", data
   
   app.get "/games/my/active", (req,res) ->
     data = assembleData req, res
@@ -86,9 +61,9 @@ exports.setupRoutes = (app) ->
       # do some date formatting
       for log in game.logs
         log.prettyDate = moment(log.date).fromNow()
-        log.prettyFirstPhase = getPhaseByID log.firstPhase, yes
-        log.prettyLastPhase = getPhaseByID log.lastPhase, yes
-        
+        log.prettyFirstPhase = logic.getPhaseByID log.firstPhase, true
+        log.prettyLastPhase = logic.getPhaseByID log.lastPhase, true
+      
       data.game = game
 
       # get player profiles
@@ -104,6 +79,7 @@ exports.setupRoutes = (app) ->
             data.avatarBsmall = data.avatarB + "/32"
           
           res.render "game.jade", data
+
           
   app.get "/game/:id/resign", (req, res) ->
     game = database.Game.findOne
@@ -113,16 +89,14 @@ exports.setupRoutes = (app) ->
       if not game
         req.flash "error", "The game you want to resign from does not exist."
         return res.redirect "/games"
-        
-      result = ""
-      result = "winB" if req.user.name == game.playerA
-      result = "winA" if req.user.name == game.playerB
       
-      if result is ""
-        req.flash "error", "You have no access to this game."
-        return res.redirect "/games"
-        
-      game.result = result
+      if req.user.name == game.playerA
+        game.resign "A"
+      else if req.user.name == game.playerB
+        game.resign "B"
+      else
+        req.flash "error", "You are not a participant in this game!"
+        return res.redirect "/game/#{req.params.id}"
         
       game.save (err) ->
         if err
@@ -130,14 +104,8 @@ exports.setupRoutes = (app) ->
         else
           req.flash "info", "You resigned from this game."
         
-        loadPlayersAndUpdateRatings game.playerA, game.playerB, (result == "winA"), (err) ->
-          if err
-            console.log "ERROR while calculating new ratings"
-            console.log err
-        
         res.redirect "/game/"+req.params.id
-      
-      
+        
   app.get "/game/:id/upload", (req,res) ->
     res.render "uploadLogfile.jade", assembleData(req, res)
   
@@ -145,12 +113,12 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false
+      empty: false 
       message: req.body.message
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
     
-    
+    # TODO move this to logic
     database.Game.findOne {_id: req.params.id}
       .populate "scenario" # needed for e-mail handler
       .exec (err, game) ->
@@ -216,8 +184,8 @@ exports.setupRoutes = (app) ->
                   .save (err) ->
                     console.log err if err
                   res.redirect "/game/" + game._id
-
-      
+                  
+                  
   app.get "/games/world/active/", (req,res) ->
     data = assembleData req, res
     database.Game.find {active: true}
@@ -229,124 +197,8 @@ exports.setupRoutes = (app) ->
             data.games = games
             console.log games
             res.render "allGames.jade", data
-      
-      
-  #actual logic
-  app.post "/do/games/challenge/issue", (req,res) -> 
-    # validate stuff
-    failed = no
-    if not req.body.opponent?
-      failed = yes
-      req.flash "error", "You have to select an opponent."
-      # TODO worry about if the opponent actually exists
-    if not req.body.timecontrol?
-      failed = yes
-      req.flash "error", "Time control data missing."
-    if not (req.body.scenario? || req.body.dyo)
-      failed = yes
-      req.flash "Please select a scenario or DYO."
-    if not req.user?.name?
-      failed = yes
-      req.flash "You are apparently not logged in."
-    
-    # no validation for message - that one is entirely optional.
-    return res.redirect "/games/challenge" if failed
-    
-    
-    # apparently, data is valid - now write to DB
-    challenge = new database.Challenge
-      from: req.user.name
-      to: req.body.opponent
-      timeControl: req.body.timecontrol
-      scenario: req.body.scenario
-      dyo: req.body.dyo
-      message: req.body.message
-      whoIsAttacker: req.body.whoIsAttacker
-    
-    #console.log challenge
-    
-    challenge.save (err) -> 
-      if err
-        req.flash "error", "Could not write to database: " + err?.message
-        return res.redirect "/error"
-
-      # saved the challenge - now, issue a notification to the challenged player
-      notification = new database.Notification
-        username: challenge.to
-        text: challenge.from+" challenged you to play "+challenge.scenarioId+" with him."
-        action: "/games/my/challenges"
-        image: "/user/"+challenge.from+"/avatar/32" #32px big avatar
-      notification.save (err) ->
-        console.log(err || "Notification created")
-        # all done... hopefully. Worry about asynchronous err handling later.
-        # no error handling for notifications, it's not really worth it.
-      res.redirect("/games/challenge/success")
-  
-  app.get "/challenges/:id/accept", (req, res) -> # TODO Authenticate!
-    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
-      res.send err if (err || not res)
-      # create a game out of the challenge
-      game = new database.Game
-        playerA: challenge.from
-        playerB: challenge.to
-        timeControl: challenge.timeControl
-        scenario: challenge.scenario
-        whoIsAttacker: challenge.whoIsAttacker
-      
-      game.save (err) ->
-        res.send err if err
-        # send notification
-        new database.Notification
-          username: challenge.from
-          text: req.user.name + " accepted your challenge."
-          action: "/game/"+game._id
-          image: "/user/"+challenge.to+"/avatar/32"
-        .save (err) ->
-          if err
-            console.log "ERROR (ignored) while writing notification:"
-            console.log err
-          
-        challenge.remove (err) ->
-          if err
-            console.log "ERROR (ignored) while deleting challenge:"
-            console.log err
-        res.redirect "/game/" + game._id
-        
-
-  app.get "/challenges/:id/decline", (req,res) -> # TODO Authenticate
-    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
-      res.render err if (err || not res)
-      new database.Notification
-        username: challenge.from
-        text: req.user.name + " declined your challenge."
-        action: "#"
-        image: "/user/"+challenge.to+"/avatar/32"
-      .save (err) ->
-        if err
-          console.log "ERROR (ignored) while saving notification:"
-          console.log err
-      challenge.remove (err) ->
-        if err
-          console.log "ERROR (ignored) while deleting challenge:"
-          console.log err
-        res.redirect "/games/my/challenges"
-        
-  app.get "/challenges/:id/takeback", (req,res) -> # TODO Authenticate
-    database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
-      res.render err if (err || not res)
-      new database.Notification
-        username: challenge.to
-        text: req.user.name + " took back his challenge to you."
-        action: "#"
-        image: "/user/"+challenge.from+"/avatar/32"
-      .save (err) ->
-        if err
-          console.log "ERROR (ignored) while saving notification:"
-          console.log err
-      challenge.remove (err) ->
-        return res.render err if err
-        res.redirect "/games/my/challenges"
-        
+            
+            
   # automatically download entire game, specified by id
   # NOTE: "perma" does nothing except determining how the resulting file will
   # be called on the client side.
@@ -376,7 +228,7 @@ exports.setupRoutes = (app) ->
           # are in one match.
           # TODO figure something out
           num = ("00"+i).substr(0, 3)
-          outName = "#{num}-#{getPhaseByID log.firstPhase}-to-#{getPhaseByID log.lastPhase}.vlog"
+          outName = "#{num}-#{logic.getPhaseByID log.firstPhase}-to-#{logic.getPhaseByID log.lastPhase}.vlog"
           
           # adm-zip does not offer standard node.js error handling
           try
@@ -405,86 +257,8 @@ exports.setupRoutes = (app) ->
 
 getBulkFileName = (game) ->
   return game?.scenario?.title?.replace /\W*/g, ""
-        
 
-  
 assembleData = (req,res) ->
   # assemble a bunch of data that pages can do stuff with
   {req: req, res: res}
-  
-  
-getPhaseByID = (id, html) ->
-  switch id
-    when 1  
-      a = "RPh"
-      b = "blue"
-    when 2  
-      a = "PFPh"
-      b = "orange"
-    when 3 
-      a = "MPh"
-      b = "green"
-    when 4 
-      a = "DFPh"
-      b = "violet"
-    when 5 
-      a = "AFPh"
-      b = "orange"
-    when 6 
-      a = "RtPh"
-      b = "black"
-    when 7  
-      a = "APh"
-      b = "black"
-    when 8  
-      a = "CCPh"
-      b = "red"
-    else
-      a = "???"
-      b = "black"
-      
-  if html 
-    return "<span style='color:"+b+"; font-weight: bold;'>"+a+"</span>"
-  else
-    return a
-
-loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
-  database.User.findOne
-    name: nameA
-  .select "rating password" # not selecting password apparently causes crash
-  .exec (err, userA) ->
-    return done err if err
-    return done new Error "No such user: "+nameA unless userA
-    database.User.findOne
-      name: nameB
-    .select "rating password"
-    .exec (err, userB) ->
-      return done err if err
-      return done new Error "No such user: "+nameB unless userB
-      ratingAdjustments userA, userB, aWon, (err) ->
-        done err
-
-  
-# aWon = true when player A won
-ratingAdjustments = (playerA, playerB, aWon, done) ->
-  # 1000 is default rating
-  ratingA = playerA.rating?.points || 1000
-  ratingB = playerB.rating?.points || 1000
-  
-  newRatingA = elo.newr ratingA, ratingB, aWon
-  newRatingB = elo.newr ratingB, ratingA, !aWon
-  
-  console.log "Rating change: #{ratingA} to #{newRatingA}"
-  console.log "Rating change: #{ratingB} to #{newRatingB}"
-  
-  playerA.rating.points = newRatingA
-  playerA.rating.games = (playerA.rating.games || 0) + 1
-  
-  playerB.rating.points = newRatingB
-  playerB.rating.games = (playerB.rating.games || 0) + 1
-  
-  playerA.save (err) ->
-    playerB.save (err2) ->
-      done err || err2
-  
   

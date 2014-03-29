@@ -5,16 +5,18 @@ redis = require "redis"
 RedisStore = require("connect-redis")(express)
 store = new RedisStore
 
-common = require "./common"
-notifications = require "./notification-loader"
-config = require "./config"
-user = require "./user"
 ajax = require "./ajax"
-error = require "./error"
-games = require "./games"
-database = require "./database"
 auth = require "./auth"
 avatar = require "./avatar"
+challenge = require "./games/challenge"
+common = require "./common"
+config = require "./config"
+database = require "./database"
+error = require "./error"
+game = require "./games/game"
+notifications = require "./notification-loader"
+user = require "./user"
+
 
 app = express()
 
@@ -71,7 +73,8 @@ app.get "/help", (req,res) ->
 
 # Login handler
 auth.setupRoutes app
-games.setupRoutes app
+game.setupRoutes app
+challenge.setupRoutes app
 user.setupRoutes app
 notifications.setupRoutes app
 ajax.setupRoutes app

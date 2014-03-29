@@ -6,6 +6,9 @@ db = mongoose.connection
 db.on "error", console.error
 db.once("open", () -> console.log("DB connection established."))
 
+gameLogic = require "./games/logic.coffee"
+
+
 mongoose.connect "mongodb://localhost/pbem"
 
 message = new mongoose.Schema
@@ -50,66 +53,9 @@ Scenario.count {}, (err, result) ->
         nation: "Germany"
     .save (err) ->
       console.log err.message
-        
-# Another TODO: Find a source for scenario data and auto-import it to MongoDB
-        
 
-log = new mongoose.Schema
-  sentBy: String # the player who sent the log
-  empty: Boolean # for these times when a player has no actions and 
-                 # btys immediately
-  date: # obvious
-    type: Date, default: Date.now
-  message: String # a comment for the game
-  
-  firstPhase: # 1 is RPh, 8 is CCPh
-    type: Number
-    default: 0
-    
-  lastPhase: # 1 is RPh, 8 is CCPh
-    type: Number
-    default: 0
-    
-  
-Log = mongoose.model "Log", log
-exports.Log = Log
-
-game = new mongoose.Schema
-  playerA: 
-    type: String
-    index: true
-  playerB: 
-    type: String
-    index: true
-  kibitzers: [String] # list of usernames who watch the game
-  started:
-    type: Date, default: Date.now
-  timeControl: String
-  scenario: 
-    type: String 
-    ref: "Scenario"
-  active:
-    type: Boolean, default: true # set to false once completed / aborted
-  result:
-    type: String
-    default: "ongoing"
-  logs: [Log.schema]
-  whoseTurn: 
-    type: String
-    enum: ["A", "B", ""]
-    default: ""
-  whoIsAttacker:
-    type: String
-    enum: ["A", "B", ""]
-    default: ""
-    
-  result:
-    type: String
-    enum: ["ongoing", "winA", "winB", "cancelled", "draw"]
-    default: "ongoing"
-  
-Game = mongoose.model "Game", game
-exports.Game = Game
+exports.Game = gameLogic.Game
+exports.Log = gameLogic.Log
 
 challenge = new mongoose.Schema
   from: 
