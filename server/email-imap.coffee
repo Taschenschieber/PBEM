@@ -15,14 +15,14 @@ gameLogic = require "./games/logic"
 parseMailHighLevel = (mail) ->
   console.log "Parsing mail "+mail.messageId
   gameId = getId mail.to[0].address
-  return console.log "Malformed incoming mail" unless gameId
+  from = mail.from[0].address
+  return sendLogErrMail from, "Malformed incoming mail" unless gameId
   
   message = mail.text # TODO remove quotes / sigs / html
   
-  return console.log "Malformed incoming mail - no attachment" unless mail.attachments?.length
+  return sendLogErrMail from, "Malformed incoming mail - no attachment" unless mail.attachments?.length
   
   # find out which user sent the log
-  from = mail.from[0].address
   database.User.findOne
     email: from
   .select "name password"
@@ -66,8 +66,8 @@ parseMailHighLevel = (mail) ->
             # in case of success, no confirmation is necessary.
             # all further actions are taken by gameLogic.
         
-sendLogErrMail = () ->
- # doNothingLoop()
+sendLogErrMail = (a, b)->
+  email.sendLogErrMail a, b
  
   
 getId = (addr) ->

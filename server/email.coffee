@@ -3,6 +3,7 @@
 # This file contains all functions related to sending mails. For the part of 
 # the server responsible for receiving incoming mails, see email-imap.coffee.
 
+jade = require "jade"
 nodemailer = require "nodemailer"
 
 # Please note: "config.coffee" is not included in the public github because
@@ -97,6 +98,21 @@ exports.sendLogMail = (game, callback) ->
       attachments: attachments
     , (err, res) ->
       callback err, res
+  
+# Send a message to a user to inform him about a failed log upload  
+exports.sendLogErrMail = (recipient, error) ->
+  jade.renderFile "views/mail/log-error.jade", {error: error}, (err, html) ->
+    return console.log err if err
+    return unless html
+    
+    transport.sendMail
+      from: config.mailSender
+      to: recipient
+      generateTextFromHTML: true
+      subject: "Error while processing your mail"
+      html: html
+    , (err, res) ->
+      console.log err if err
 
 # send a newly-registered user an e-mail asking him to confirm his address
 # user = the relevant database entry (conforming to UserSchema)
