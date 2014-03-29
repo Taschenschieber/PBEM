@@ -3,11 +3,14 @@
 # This file is responsible for handling everything related to creating, playing
 # and watching games.
 #
-# TODO Make nice route listActiveGames
+# TODO Make nice route list
 
 mkdirp = require "mkdirp"
 fs = require "fs"
 moment = require "moment"
+tmp = require "tmp"
+ZIP = require "adm-zip" # NOTE: Does not currently work with official version
+                        # of adm-zip. See package.json
 
 avatar = require "./avatar"
 common = require "./common"
@@ -81,8 +84,8 @@ exports.setupRoutes = (app) ->
       # do some date formatting
       for log in game.logs
         log.prettyDate = moment(log.date).fromNow()
-        log.prettyFirstPhase = getPhaseByID log.firstPhase
-        log.prettyLastPhase = getPhaseByID log.lastPhase
+        log.prettyFirstPhase = getPhaseByID log.firstPhase, yes
+        log.prettyLastPhase = getPhaseByID log.lastPhase, yes
         
       data.game = game
 
@@ -341,6 +344,60 @@ exports.setupRoutes = (app) ->
       challenge.remove (err) ->
         return res.render err if err
         res.redirect "/games/my/challenges"
+        
+  app.get "/game/:id/:perma.zip", (req, res) -> # automatically download entire game
+    database.Game.findOne {_id: req.params.id}
+      .populate "scenario"
+      .select "scenario logs playerA playerB whoIsAttacker result started _id"
+      .exec (err, game) ->
+        return error.handle err if err
+        unless game
+          console.log "404 - "+req.path
+          req.flash "error", "The game you requested does not exist."
+          return res.redirect "/games"
+        
+        console.log "Packing game into ZIP"
+
+        
+        zip = new ZIP()
+        i = 1
+        
+        readmeText = "This folder contains a playthrough of the ASL scenario
+            #{game.scenario.number} - #{game.scenario.title}.\n\n
+            The game was played by #{game.playerA} and #{game.playerB},
+            starting at #{game.started}.\r\n\r\n"
+        
+        for log in game.logs
+          console.log "BLUBB"
+          inName = __dirname+"/pub/logfiles/#{req.params.id}/#{log.id}.vlog"
+          # add trailing zeroes - will create problems when more than 999 logs
+          # are in one match.
+          # TODO figure something out
+          num = ("00"+i).substr(0, 3)
+          outName = "#{num}-#{getPhaseByID log.firstPhase}-to-#{getPhaseByID log.lastPhase}.vlog"
+          
+          # adm-zip does not offer standard node.js error handling
+          try
+            zip.addLocalFile inName, outName
+          catch err
+            console.log "404 - Failed to retrieve #{inName}"
+            console.log err
+            readmeText += "The log file #{outName} is missing in this folder,
+              it could not be retrieved due to a database error. Please contact
+              the server admin to fix this error.\r\n\r\n"
+            
+          console.log "#{inName} -> #{outName}"
+          i = i+1
+          
+        # add readme
+        zip.addFile "readme.txt", new Buffer(readmeText), ""
+          
+        # ZIP created
+        console.log "ZIP packed"
+        res.set "Content-Type", "application/zip"
+        res.send zip.toBuffer()
+        
+        
 
   
 assembleData = (req,res) ->
@@ -348,7 +405,7 @@ assembleData = (req,res) ->
   {req: req, res: res}
   
   
-getPhaseByID = (id) ->
+getPhaseByID = (id, html) ->
   switch id
     when 1  
       a = "RPh"
@@ -378,7 +435,10 @@ getPhaseByID = (id) ->
       a = "???"
       b = "black"
       
-  return "<span style='color:"+b+"; font-weight: bold;'>"+a+"</span>"
+  if html 
+    return "<span style='color:"+b+"; font-weight: bold;'>"+a+"</span>"
+  else
+    return a
 
 loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
   database.User.findOne

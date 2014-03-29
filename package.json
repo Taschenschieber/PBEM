@@ -19,7 +19,9 @@
     "gravatar": "*",
     "moment": "*",
     "mailparser": "*",
-    "inbox": "*"
+    "inbox": "*",
+    "adm-zip": "git://github.com/Taschenschieber/adm-zip.git",
+    "tmp": "*"
    },
   
   "devDependencies": {
