@@ -7,6 +7,7 @@
 
 mkdirp = require "mkdirp"
 fs = require "fs"
+jade = require "jade"
 moment = require "moment"
 tmp = require "tmp"
 ZIP = require "adm-zip" # NOTE: Does not currently work with official version
@@ -80,6 +81,7 @@ exports.setupRoutes = (app) ->
       else
         data.activePlayer = ""
       
+      data.bulkName = getBulkFileName game
       
       # do some date formatting
       for log in game.logs
@@ -143,7 +145,7 @@ exports.setupRoutes = (app) ->
     # create database document in order to have an ID
     log = new database.Log 
       sentBy: req.user.name
-      empty: false 
+      empty: false
       message: req.body.message
       firstPhase: req.body.firstPhase
       lastPhase: req.body.lastPhase
@@ -345,7 +347,10 @@ exports.setupRoutes = (app) ->
         return res.render err if err
         res.redirect "/games/my/challenges"
         
-  app.get "/game/:id/:perma.zip", (req, res) -> # automatically download entire game
+  # automatically download entire game, specified by id
+  # NOTE: "perma" does nothing except determining how the resulting file will
+  # be called on the client side.
+  app.get "/game/:id/:perma.zip", (req, res) -> 
     database.Game.findOne {_id: req.params.id}
       .populate "scenario"
       .select "scenario logs playerA playerB whoIsAttacker result started _id"
@@ -358,17 +363,14 @@ exports.setupRoutes = (app) ->
         
         console.log "Packing game into ZIP"
 
-        
+        data = # data for JADE rendering goes here
+          game: game
+          date: moment().format("YYYY-MM-DD")
+          errors: []
         zip = new ZIP()
         i = 1
         
-        readmeText = "This folder contains a playthrough of the ASL scenario
-            #{game.scenario.number} - #{game.scenario.title}.\n\n
-            The game was played by #{game.playerA} and #{game.playerB},
-            starting at #{game.started}.\r\n\r\n"
-        
         for log in game.logs
-          console.log "BLUBB"
           inName = __dirname+"/pub/logfiles/#{req.params.id}/#{log.id}.vlog"
           # add trailing zeroes - will create problems when more than 999 logs
           # are in one match.
@@ -378,25 +380,31 @@ exports.setupRoutes = (app) ->
           
           # adm-zip does not offer standard node.js error handling
           try
-            zip.addLocalFile inName, outName
+            zip.addLocalFile inName, "", outName
           catch err
             console.log "404 - Failed to retrieve #{inName}"
             console.log err
-            readmeText += "The log file #{outName} is missing in this folder,
+            data.errors.push "The log file #{outName} is missing in this folder,
               it could not be retrieved due to a database error. Please contact
               the server admin to fix this error.\r\n\r\n"
             
           console.log "#{inName} -> #{outName}"
           i = i+1
-          
+            
         # add readme
-        zip.addFile "readme.txt", new Buffer(readmeText), ""
-          
-        # ZIP created
-        console.log "ZIP packed"
-        res.set "Content-Type", "application/zip"
-        res.send zip.toBuffer()
-        
+        jade.renderFile "views/download/bulk.jade", data, (err, html) ->
+          unless err
+            zip.addFile "readme.html", new Buffer(html), ""
+          else
+            console.log err
+            
+          # ZIP created
+          console.log "ZIP packed"
+          res.set "Content-Type", "application/zip"
+          res.send zip.toBuffer()          
+
+getBulkFileName = (game) ->
+  return game?.scenario?.title?.replace /\W*/g, ""
         
 
   

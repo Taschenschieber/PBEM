@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title= game.scenario.title
+  body
+    h1
+      = game.scenario.title
+    p 
+        | Downloaded on&nbsp;
+        = date
+    p 
+      | This folder contains all log files 
+      if game.result == "ongoing"
+        | so far 
+      | for a match of the scenario 
+      = game.scenario.number
+      | &nbsp;"
+      = game.scenario.title
+      | " played by 
+      = game.playerA
+      | &nbsp;and 
+      = game.playerB
+      | . 
+      if game.result == "ongoing"
+        | The match was not finished yet when this files were downloaded.
+      if game.result == "winA"
+        = game.playerA+" "
+        | won.
+      else if game.result == "winB"
+        = game.playerB+" "
+        | won.
+      else if game.result == "draw"
+        | The game was drawn.
+      else if game.result == "cancelled"
+        | The game was cancelled by mutual agreement.
+    if errors.length
+      h3 Errors
+      p Some errors occured while creating your download. Some files might be missing. Please contact the server admin if you need the missing files.
+      p The errors are listed below.
+      ul
+        each err in errors
+          li= err
+      

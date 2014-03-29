@@ -121,6 +121,8 @@ block content
       p
         a.btn.btn-info.active(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id+".vlog") Download latest log
         | &nbsp;
+        a.btn.btn-info.active(href="/game/"+game._id+"/"+bulkName+".zip") Download game
+        | &nbsp;
         if game.result == "ongoing"
           if isactive
             a.btn.btn-primary.btn-large.active(href="/game/"+game._id+"/upload", role="button") Upload log 
