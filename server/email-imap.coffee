@@ -34,7 +34,17 @@ parseMailHighLevel = (mail) ->
       return sendLogErrMail from, "Your address is not associated with any account."
     if user.banned
       return
-    
+      
+    parts = message.split /\r?\n/
+    message = ""
+    for part in parts
+      console.log "Line: ", part
+      if part.indexOf("-----BEGIN PGP SIGNATURE-----") >= 0
+        break # this feature is for me personally! :) 
+      
+      unless part.trim().charAt(0) in ["-", ">", "="]
+        message += part+"\n"
+  
     log = new database.Log
       sentBy: user.name
       empty: false 
