@@ -24,7 +24,7 @@ block content
       .form-group#scenario-area
         label Scenario
         input#scenario(type="hidden", name="scenario")
-        input.form-control#scenarioText(type="text", name="scenarioText", onkeypress="javascript:window.scenario();")
+        input.form-control#scenarioText(type="text", name="scenarioText", onkeyup="javascript:window.scenario();")
         label.suggestions Suggestions
       .form-group
         label Your side

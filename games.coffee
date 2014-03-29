@@ -410,10 +410,10 @@ ratingAdjustments = (playerA, playerB, aWon, done) ->
   console.log "Rating change: #{ratingB} to #{newRatingB}"
   
   playerA.rating.points = newRatingA
-  playerA.rating.games = (playerA.rating.games || 1) + 1
+  playerA.rating.games = (playerA.rating.games || 0) + 1
   
   playerB.rating.points = newRatingB
-  playerB.rating.games = (playerB.rating.games || 1) + 1
+  playerB.rating.games = (playerB.rating.games || 0) + 1
   
   playerA.save (err) ->
     playerB.save (err2) ->
