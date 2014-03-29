@@ -4,8 +4,12 @@ mixin list(games)
   table.table
     each game in games
       tr
-        td= game.playerA
-        td= game.playerB
+        td(width="32px"): img(src="/user/"+game.playerA+"/avatar/32")
+        td
+          +tname(game.playerA)
+        td(width="32px"): img(src="/user/"+game.playerB+"/avatar/32")
+        td
+          +tname(game.playerB)
         if game.scenario && game.scenario.number
           td
             strong= game.scenario.number
@@ -13,6 +17,12 @@ mixin list(games)
         else
           td Custom Scenario
         td: a(href="/game/"+game.id) Show Details
+        
+mixin tname(n)
+  if n == req.user.name
+    strong You
+  else
+    a(href="/user/"+n)= n
 
 block secondary-nav
   include secondary-nav-games
@@ -23,7 +33,7 @@ block content
   else if name == ""
     h1 All #{state} games
   else
-    h1 #{name}'s #{state} games
+    h1 #{+tname(name)}'s #{state} games
     
   if games && games.length > 0
     +list(games)
