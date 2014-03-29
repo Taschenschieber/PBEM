@@ -97,7 +97,7 @@ exports.setupRoutes = (app) ->
             data.avatarB = "/user/"+user.name+"/avatar"
             data.avatarBsmall = data.avatarB + "/32"
           
-          res.render "game.jade", data
+          res.render "games/game.jade", data
 
           
   app.get "/game/:id/resign", (req, res) ->
@@ -126,7 +126,7 @@ exports.setupRoutes = (app) ->
         res.redirect "/game/"+req.params.id
         
   app.get "/game/:id/upload", (req,res) ->
-    res.render "uploadLogfile.jade", assembleData(req, res)
+    res.render "games/upload.jade", assembleData(req, res)
   
   app.post "/game/:id/upload/do", (req,res) ->
     # create database document in order to have an ID

@@ -143,7 +143,7 @@ exports.setupRoutes = (app) ->
         if err
           console.log "ERROR (ignored) while deleting challenge:"
           console.log err
-        res.redirect "/games/my/challenges"
+        res.redirect "/challenges/list"
         
   app.get "/challenges/:id/takeback", (req,res) -> # TODO Authenticate
     database.Challenge.findOne {_id: req.params.id}, (err, challenge) ->
@@ -159,7 +159,7 @@ exports.setupRoutes = (app) ->
           console.log err
       challenge.remove (err) ->
         return res.render err if err
-        res.redirect "/games/my/challenges"
+        res.redirect "/challenges/list"
 
 
 assembleData = (req,res) ->
