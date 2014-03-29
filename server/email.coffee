@@ -68,7 +68,7 @@ exports.sendLogMail = (game, callback) ->
       text += "<p>Additionally, the new log file is also attached to this e-mail.</p>"
       attachments.push
         fileName: "latest.vlog"
-        filePath: __dirname + "/pub/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}.vlog"
+        filePath: "./pub/logfiles/#{game._id}/#{game.logs[game.logs.length-1]._id}.vlog"
       
       
     text += "<p>You can either upload your log file on the web site linked 

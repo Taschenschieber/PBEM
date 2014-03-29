@@ -23,7 +23,7 @@ error404 = (req,res,next) -> res.status(404).render "404.jade", {req:req,res:res
   
 app.configure () ->
   # static files go first
-  app.use express.static __dirname + "/pub"
+  app.use express.static "./pub"
   
   # middleware settings
   app.locals.pretty = true # serve readable html files
@@ -62,7 +62,7 @@ app.get "/error", (req,res) -> res.render("error.jade", assembleData(req,res))
 
 app.get "/help/:topic", (req,res) ->
   topic = req.params.topic
-  if fs.existsSync __dirname+"/views/help/"+topic+".jade"
+  if fs.existsSync "./views/help/"+topic+".jade"
     res.render "help/"+topic+".jade", {req:req,res:res}
   # no err handling necessary, middleware will catch it
   

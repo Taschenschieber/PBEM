@@ -171,13 +171,13 @@ exports.setupRoutes = (app) ->
         game.save (err) ->
           return res.send err if err
           console.log log._id
-          path = __dirname + "/pub/logfiles/#{game._id}/#{log._id}.vlog"
+          path = "./pub/logfiles/#{game._id}/#{log._id}.vlog"
           console.log "Saving to: ", path
           console.log "Tempfile: ", req.files.logfile.path
           fs.readFile req.files.logfile.path, (err, data) ->
             return res.send err if err
-            console.log "Making dir: ", __dirname + "/pub/logfiles/"+game._id
-            mkdirp __dirname + "/pub/logfiles/"+game._id, (err) ->
+            console.log "Making dir: ", "./pub/logfiles/"+game._id
+            mkdirp "./pub/logfiles/"+game._id, (err) ->
               if err
                 # oh bollocks! Delete log from DB to ensure consistency
                 # well... eventual consistency
@@ -371,7 +371,7 @@ exports.setupRoutes = (app) ->
         i = 1
         
         for log in game.logs
-          inName = __dirname+"/pub/logfiles/#{req.params.id}/#{log.id}.vlog"
+          inName = "./pub/logfiles/#{req.params.id}/#{log.id}.vlog"
           # add trailing zeroes - will create problems when more than 999 logs
           # are in one match.
           # TODO figure something out
