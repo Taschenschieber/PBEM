@@ -1,4 +1,7 @@
-# contains all e-mail related functions - setup, sending and later receiving mail
+# (c) 2014 Stephan Hillebrand
+#
+# This file contains all functions related to sending mails. For the part of 
+# the server responsible for receiving incoming mails, see email-imap.coffee.
 
 nodemailer = require "nodemailer"
 
@@ -94,11 +97,6 @@ exports.sendLogMail = (game, callback) ->
       attachments: attachments
     , (err, res) ->
       callback err, res
-
-exports.handleAttachment = (gameId, attachment, message) ->
-  console.log gameId
-  console.log attachment?
-  console.log message
 
 # send a newly-registered user an e-mail asking him to confirm his address
 # user = the relevant database entry (conforming to UserSchema)

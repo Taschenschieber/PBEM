@@ -115,7 +115,10 @@ exports.getPhaseByID = (id, html) ->
       a = "CCPh"
       b = "red"
     else
-      a = "???"
+      if html
+        a = "???"
+      else
+        a = "xxx" # file name compatible
       b = "black"
       
   if html 

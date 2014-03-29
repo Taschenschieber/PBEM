@@ -2,11 +2,15 @@
 #
 # This file handles low-level IMAP stuff, so email.coffee remains clutter-free.
 
+fs = require "fs"
 inbox = require "inbox"
 MailParser = require("mailparser").MailParser
+tmp = require "tmp"
 
 config = require "./config"
+database = require "./database"
 email = require "./email"
+gameLogic = require "./games/logic"
 
 parseMailHighLevel = (mail) ->
   console.log "Parsing mail "+mail.messageId
@@ -16,9 +20,55 @@ parseMailHighLevel = (mail) ->
   message = mail.text # TODO remove quotes / sigs / html
   
   return console.log "Malformed incoming mail - no attachment" unless mail.attachments?.length
+  
+  # find out which user sent the log
+  from = mail.from[0].address
+  database.User.findOne
+    email: from
+  .select "name password"
+  .exec (err, user) ->
+    if err
+      console.log err
+      return sendLogErrMail from, err.message
+    if not user
+      return sendLogErrMail from, "Your address is not associated with any account."
+    if user.banned
+      return
     
-  #email.handleAttachment gameId, attachment, message
-
+    log = new database.Log
+      sentBy: user.name
+      empty: false 
+      message: message
+      # TODO find a way to parse first and last phase
+      #firstPhase: req.body.firstPhase
+      #lastPhase: req.body.lastPhase
+  
+    database.Game.findOne
+      _id: gameId
+    .exec (err, game) ->
+      if err
+        sendLogErrMail from, err.message
+        console.log err
+      if not game
+        sendLogErrMail from, "The game ID is invalid."
+  
+      # get tmp file name
+      tmp.tmpName {template: "./uploads/mail-XXXXXXXX"}, (err, file) ->
+        fs.writeFile file, mail.attachments[0].content, (err) ->
+          if err 
+            console.log err
+            return sendLogErrMail from, err.message
+  
+          gameLogic.addLog log, file, game, user, (err) ->
+            if err
+              console.log err
+              return sendLogErrMail from, err.message
+            # in case of success, no confirmation is necessary.
+            # all further actions are taken by gameLogic.
+        
+sendLogErrMail = () ->
+ # doNothingLoop()
+ 
   
 getId = (addr) ->
   start = addr.indexOf("+")+1

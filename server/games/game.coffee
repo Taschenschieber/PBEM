@@ -201,7 +201,6 @@ exports.setupRoutes = (app) ->
           if err
             return error.handle err
           req.flash "info", "Your log was successfully uploaded."
-          console.log "TEST"
           res.redirect "/game/#{game.id}"
             
             
