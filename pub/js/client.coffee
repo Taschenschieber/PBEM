@@ -96,6 +96,18 @@ window.editProfileDone = (which) ->
       <span class='glyphicon glyphicon-pencil' /></a>"
   return
   
+window.checkboxToggle = (id) ->
+    if $("#"+id).prop("checked") == "true"
+      value = "on"
+    else
+      value = "off"
+    $.ajax "/ajax/profile/"+encodeURI(id)+"/"+value
+      .done (response, status) ->
+        if status is 100 # HTTP OK
+          $("##{id}-confirm").html("<span class='profile-success'>Saved</span>")
+        else
+          $("##{id}-confirm").html("<span class='profile-error'>Error #{status}<span>")
+
   
 ###
   #  tabbing

@@ -218,6 +218,8 @@ exports.addLog = (log, file, game, user, done) ->
             email.sendLogMail game, (err, response) ->
               console.log err if err
               console.log "Mail transport with response", response if response
+            for user in game.kibitzers
+              email.sendKibitzMail game, user # fire&forget error handling
             notificationTarget = game.playerA
             if game.whoseTurn == "B"
               notificationTarget = game.playerB

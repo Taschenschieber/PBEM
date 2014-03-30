@@ -114,6 +114,8 @@ userSchema = new mongoose.Schema
       type: Boolean, default: false
     onChallenge:
       type: Boolean, default: false
+    onKibitz:
+      type: Boolean, default: false
   inbox: [message]
   outbox: [message]
   

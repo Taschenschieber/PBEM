@@ -42,23 +42,34 @@ exports.setupRoutes = (app) ->
       else
         res.send users
   
-  app.get "/ajax/profile/:field/:value", (req, res) ->
-    console.log "BLA"
+  app.get "/ajax/profile/:field/:value", (req, res) ->      
+    console.log "FOO"
+
     field = decodeURI req.params.field
     value = decodeURI req.params.value
     #validate
-    unless value.match /[a-zA-Z0-9]*/
-      return res.status(403).send(req.user?.profile?[field] || "")
-    unless field in ["gamesquad", "thegeek", "facebook", "gplus", "twitter", 
-      "xmpp"]
-      return res.status(403).send ""
-    console.log "BLUBB"
-    oldval = req.user?.profile?[field] || ""
     
-    req.user.profile[field] = value
+    unless value.match /[a-zA-Z0-9]+/
+      return res.send(403, req.user?.profile?[field] || " ")
+      
+    if field in ["gamesquad", "thegeek", "facebook", "gplus", "twitter", "xmpp"]
+      oldval = req.user?.profile?[field] || ""
+      req.user.profile[field] = value
+    
+    else if field in ["onNewLog", "onNewLogWithLog", "onKibitz", "onChallenge"]
+      oldval = req.user?.notifications?[field] || false
+      if value == "on"
+        value = true
+      else
+        value = false
+      req.user.notifications[field] = value
+     
+    else
+      return res.send 403, oldval
+    
     req.user.save (err) ->
-      console.log "ÖÖÖÖ"
       if err
-        return res.send oldval  
-      return res.send value
-        
+        console.log err
+        return res.send 500, oldval  
+      return res.send 100, value
+    

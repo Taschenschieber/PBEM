@@ -113,6 +113,25 @@ exports.sendLogErrMail = (recipient, error) ->
       html: html
     , (err, res) ->
       console.log err if err
+      
+      
+# no callback - error handling is fire & forget due to low importance
+exports.sendKibitzMail = (game, userName) ->
+  database.User.findOne userName, (err, user) ->
+    return console.log err if err
+    return console.log "No such user:", user if user
+    
+    jade.renderFile "views/mail/log-kibitz.jade", {game: game, user: user, server: config.server.url}, (err, html) ->
+      return console.log err if err
+      transport.sendMail
+        from: config.mailSender
+        to: user.email
+        generateTextFromHTML: true 
+        subject: "New move in '#{game.scenario.title}'"
+        html: html
+      , (err, res) ->
+        if err 
+          console.log err
 
 # send a newly-registered user an e-mail asking him to confirm his address
 # user = the relevant database entry (conforming to UserSchema)
