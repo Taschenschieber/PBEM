@@ -159,20 +159,24 @@ exports.setupRoutes = (app) ->
         return res.redirect "/games"
       
       if req.user.name == game.playerA
-        game.resign "A"
+        who = "A"
       else if req.user.name == game.playerB
-        game.resign "B"
+        who = "B"
       else
         req.flash "error", "You are not a participant in this game!"
         return res.redirect "/game/#{req.params.id}"
-        
-      game.save (err) ->
+      
+      game.resign who, (err) ->
         if err
-          req.flash "error", "There was an error while writing to the database."
-        else
-          req.flash "info", "You resigned from this game."
-        
-        res.redirect "/game/"+req.params.id
+          req.flash "error", error.message
+          res.redirect "/game/"+req.params.id
+        game.save (err) ->
+          if err
+            req.flash "error", "There was an error while writing to the database."
+          else
+            req.flash "info", "You resigned from this game."
+          
+          res.redirect "/game/"+req.params.id
         
   app.get "/game/:id/upload", auth.loggedIn, (req,res) ->
     res.render "games/upload.jade", assembleData(req, res)

@@ -68,20 +68,20 @@ game = new mongoose.Schema
     enum: ["ongoing", "winA", "winB", "cancelled", "draw"]
     default: "ongoing"
 
-game.methods.resign = (player) ->
-  aWon
+game.methods.resign = (player, done) ->
+  unless this.result == "ongoing"
+    return done new Error "This game is already finished." # it should never be possible to resign from a game twice
+  aWon = false
   if player == "A"
-    aWon = false 
-    result = "winB"
+    aWon = false
+    this.result = "winB"
   else if player == "B"
-    result = "winA"
+    this.result = "winA"
     aWon = true
   else 
-    return   
+    return done new Error "Invalid parameter 'player': #{player}"
   loadPlayersAndUpdateRatings this.playerA, this.playerB, aWon, (err) ->
-    if err 
-      console.log "Could not update ratings"
-      console.log err
+    done err
   
   
 exports.Game = Game = database.mongoose.model "Game", game
@@ -128,7 +128,7 @@ exports.getPhaseByID = (id, html) ->
 
 # Wrapper for ratingAdjustments - takes usernames instead of user objects
 # as argument
-exports.loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
+loadPlayersAndUpdateRatings = exports.loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
   database.User.findOne
     name: nameA
   .select "rating password" # not selecting password apparently causes crash
@@ -147,13 +147,13 @@ exports.loadPlayersAndUpdateRatings = (nameA, nameB, aWon, done) ->
  
 # Adjust ratings after a game was concluded 
 # aWon = true when player A won
-exports.ratingAdjustments = (playerA, playerB, aWon, done) ->
+ratingAdjustments = exports.ratingAdjustments = (playerA, playerB, aWon, done) ->
   # 1000 is default rating
   ratingA = playerA.rating?.points || 1000
   ratingB = playerB.rating?.points || 1000
   
-  newRatingA = elo.newr ratingA, ratingB, aWon
-  newRatingB = elo.newr ratingB, ratingA, !aWon
+  newRatingA = newElo ratingA, ratingB, aWon
+  newRatingB = newElo ratingB, ratingA, !aWon
   
   console.log "Rating change: #{ratingA} to #{newRatingA}"
   console.log "Rating change: #{ratingB} to #{newRatingB}"
@@ -166,7 +166,7 @@ exports.ratingAdjustments = (playerA, playerB, aWon, done) ->
   
   playerA.save (err) ->
     playerB.save (err2) ->
-      done err || err2
+      done (err || err2)
       
 exports.addLog = (log, file, game, user, done) -> 
   unless log and game and file and user and done
@@ -243,7 +243,7 @@ exports.addLog = (log, file, game, user, done) ->
             done false
               
 # Calculate new rating
-exports.newElo = (own, opponent, won) ->
+newElo = (own, opponent, won) ->
   Math.floor own + kFactor(own)*(won - exp(own, opponent)), 100
   # no rating lower than 100 should be possible
   
