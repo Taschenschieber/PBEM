@@ -221,8 +221,14 @@ exports.addLog = (log, file, game, user, done) ->
             email.sendLogMail game, (err, response) ->
               console.log err if err
               console.log "Mail transport with response", response if response
-            for user in game.kibitzers
+            for kibitz in game.kibitzers
               email.sendKibitzMail game, user # fire&forget error handling
+              new database.Notification
+                username: kibitz
+                text: "#{user.name} moved in #{game.scenario.title}."
+                action: "/game/#{game.id}"
+                image: "/user/#{user.name}/avatar/32"
+              .save (err) -> console.log err if err
             notificationTarget = game.playerA
             if game.whoseTurn == "B"
               notificationTarget = game.playerB
@@ -230,7 +236,7 @@ exports.addLog = (log, file, game, user, done) ->
               username: notificationTarget
               text: "It's your turn in #{game.scenario.title}!"
               action: "/game/#{game.id}"
-              image: "/avatar/#{user}"
+              image: "/user/#{user.name}/avatar/32"
             .save (err) ->
               console.log err if err # non-blocking error
               

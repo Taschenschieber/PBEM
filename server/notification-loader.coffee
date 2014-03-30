@@ -15,7 +15,15 @@ exports.populate = (req, res, next) ->
     if req.user?.name?
       name = req.user.name
       # user is logged in - get his notifications and populate the request with them
-      database.getNotifications req.user.name, (err, notifications) -> 
+      database.Notification.find
+        $or: [
+          username: req.user.name
+        ,
+          username: req.user._id
+        ]
+      .sort "-date"
+      .limit "10"
+      .exec (err, notifications) ->
         req.notifications = notifications
 
         # load some other data as well - matches where it is this user's move,
@@ -50,8 +58,12 @@ exports.setupRoutes = (app) ->
   app.get "/notifications/delete", (req,res) ->
     if req?.user?.name
       database.Notification.remove
-        username: req.user.name
-      , (err) ->
+        $or: [
+          username: req.user.name
+        ,
+          username: req.user._id
+        ]
+      .exec (err) ->
         console.log err if err
         res.send ""
       

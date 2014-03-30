@@ -81,7 +81,7 @@ Challenge = mongoose.model "Challenge", challenge
 exports.Challenge = Challenge  
 
 notificationSchema = new mongoose.Schema
-  username: 
+  username: # reference can either be user name or id
     type: String
     index: true
   text: String
