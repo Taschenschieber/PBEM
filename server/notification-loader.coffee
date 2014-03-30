@@ -9,6 +9,8 @@
 # /notifications/:id - handle user click on a notification
 # notifications/delete - delete all notifications for the current user
 
+moment = require "moment"
+
 database = require "./database"
 
 exports.populate = (req, res, next) ->
@@ -26,6 +28,10 @@ exports.populate = (req, res, next) ->
       .exec (err, notifications) ->
         req.notifications = notifications
 
+        # fancy dates
+        for notification in notifications
+          notification.fancyDate = moment(notification.date).fromNow()
+        
         # load some other data as well - matches where it is this user's move,
         # open challenges and messages
         

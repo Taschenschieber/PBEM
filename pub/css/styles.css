@@ -45,3 +45,10 @@ table.stats td, table.stats th {
 table.own-profile td, table.own-profile th {
   padding: 5px;
 }
+
+.notification-small {
+  padding: 2px;
+  margin: 2px;
+  font-size: 8pt;
+  color: light-grey;
+}

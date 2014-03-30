@@ -5,8 +5,10 @@ mixin notifications(notifications)
       li
         //- manual size information just in case the image can't be loaded
         a(href="/notifications/" + notification._id)
-          img(src=notification.image, width="32px", height="32px", float="left")
-          = notification.text
+          img(src=notification.image, width="32px", height="32px", float="none")
+          span= notification.text
+          | <br/>
+          span(class="notification-small")= notification.fancyDate
 
 if(req.notifications && req.notifications.length)
   li
