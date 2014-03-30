@@ -47,8 +47,8 @@ exports.setupRoutes = (app) ->
 
     field = decodeURI req.params.field
     value = decodeURI req.params.value
-    #validate
     
+    #validate
     unless value.match /[a-zA-Z0-9]+/
       return res.send(403, req.user?.profile?[field] || " ")
       
@@ -64,12 +64,12 @@ exports.setupRoutes = (app) ->
         value = false
       req.user.notifications[field] = value
      
-    else
+    else # field is invalid
       return res.send 403, oldval
     
     req.user.save (err) ->
       if err
         console.log err
         return res.send 500, oldval  
-      return res.send 100, value
+      return res.send 200, value
     

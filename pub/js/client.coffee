@@ -102,11 +102,11 @@ window.checkboxToggle = (id) ->
     else
       value = "off"
     $.ajax "/ajax/profile/"+encodeURI(id)+"/"+value
-      .done (response, status) ->
-        if status is 100 # HTTP OK
+      .success (response, status) ->
           $("##{id}-confirm").html("<span class='profile-success'>Saved</span>")
-        else
-          $("##{id}-confirm").html("<span class='profile-error'>Error #{status}<span>")
+      .fail (response, status) ->
+         $("##{id}-confirm").html("<span class='profile-error'>Error #{response}<span>")
+
 
   
 ###
