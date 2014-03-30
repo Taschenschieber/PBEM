@@ -232,7 +232,9 @@ exports.setupRoutes = (app) ->
           # add trailing zeroes - will create problems when more than 999 logs
           # are in one match.
           # TODO figure something out
-          num = ("00"+i).substr(0, 3)
+          num = ""+i
+          while num.length < 3
+            num = "0"+num
           outName = "#{num}-#{logic.getPhaseByID log.firstPhase}-to-#{logic.getPhaseByID log.lastPhase}.vlog"
           
           # adm-zip does not offer standard node.js error handling
