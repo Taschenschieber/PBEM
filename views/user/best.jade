@@ -7,7 +7,7 @@ mixin ratingLine(user, i)
     td: a(href="/user/"+user.name)= user.name
     td
       if user.rating.games >= 10
-        = "(<span style='color:grey'>"+user.rating.points+"</span>)"
+        span(style='color:grey')= user.rating.points
       else
         = user.rating.points
 
