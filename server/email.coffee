@@ -117,9 +117,19 @@ exports.sendLogErrMail = (recipient, error) ->
       
 # no callback - error handling is fire & forget due to low importance
 exports.sendKibitzMail = (game, userName) ->
-  database.User.findOne userName, (err, user) ->
+  console.log "Sending kibitz notification to #{userName} for #{game.id}"
+  database.User.findOne
+    $or: [
+      name: userName
+    ,
+      _id: userName
+    ]
+  .exec (err, user) ->
     return console.log err if err
-    return console.log "No such user:", user if user
+    return console.log "No such user:", userName unless user
+    
+    unless user.notifications?.onKibitz
+      return console.log "Skipping kibitz notification for #{user.name}, not requested"
     
     jade.renderFile "views/mail/log-kibitz.jade", {game: game, user: user, server: config.server.url}, (err, html) ->
       return console.log err if err
@@ -132,6 +142,7 @@ exports.sendKibitzMail = (game, userName) ->
       , (err, res) ->
         if err 
           console.log err
+        console.log "Mail transport finished", res
 
 # send a newly-registered user an e-mail asking him to confirm his address
 # user = the relevant database entry (conforming to UserSchema)

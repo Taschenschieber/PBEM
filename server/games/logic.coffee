@@ -192,15 +192,17 @@ exports.addLog = (log, file, game, user, done) ->
       console.log "Making dir: ", "./pub/logfiles/"+game._id
       mkdirp "./pub/logfiles/"+game._id, (err) ->
         if err
-          # oh bollocks! Delete log from DB to ensure consistency
-          # well... eventual consistency
+          console.log "Reverting log upload due to an error:"
+          console.log err
           if game.logs.indexOf log >= 0
             game.logs.splice(game.logs.indexOf(log), 1)
             
           game.whoseTurn = previousPlayer
           game.save (err) ->
-            #do nothing
-            console.log err if err
+            if err
+              console.log "An error occured while adding a log file. An 
+                additional error occured while reverting: "
+              console.log err
           return done err
         fs.writeFile path, data, (err2) ->
           if err2
@@ -211,8 +213,9 @@ exports.addLog = (log, file, game, user, done) ->
               
             game.whoseTurn = previousPlayer
             game.save (err) ->
-              #do nothing
-              console.log " "
+              console.log "An error occured while adding a log file. An 
+                additional error occured while reverting: "
+              console.log err
             return done err2
           else
             email.sendLogMail game, (err, response) ->

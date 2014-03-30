@@ -43,8 +43,6 @@ exports.setupRoutes = (app) ->
         res.send users
   
   app.get "/ajax/profile/:field/:value", (req, res) ->      
-    console.log "FOO"
-
     field = decodeURI req.params.field
     value = decodeURI req.params.value
     
