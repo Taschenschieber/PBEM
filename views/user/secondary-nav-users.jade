@@ -1,5 +1,7 @@
+include ../mixins/menu_entry
+
 ul.nav.nav-pills.nav-stacked
-  li: a(href="/user/me") My account
-  li: a(href="/users/messenger") Messenger
-  li: a(href="/users/find") User Directory
-  li: a(href="/users/best") Best players
+  +menuEntry("My Account", "/user/me", "/user/me")
+  +menuEntry("Messenger", "/users/messenger", "/users/messenger")
+  +menuEntry("User Directory", "/users/find", "/users/find*")
+  +menuEntry("Best players", "/users/best", "/users/best")

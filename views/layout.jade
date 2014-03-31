@@ -1,5 +1,5 @@
-mixin entry(title, url)
-  if req.path == url
+mixin entry(title, url, activeIf)
+  if req.url.search(activeIf) >= 0
     li.active: a(href=url)= title
   else
     li: a(href=url)= title
@@ -34,9 +34,9 @@ html
             a.navbar-brand(href="#") PBEM
           .collapse.navbar-collapse
             ul.nav.navbar-nav
-              +entry("Games", "/games")
-              +entry("Community", "/users")
-              +entry("Help", "/help")
+              +entry("Games", "/games", /(\/game|\/challenge)/)
+              +entry("Community", "/users", "/user")
+              +entry("Help", "/help", "/help")
               li.divider
               include notifications
             p.navbar-right.navbar-text Logged in as 

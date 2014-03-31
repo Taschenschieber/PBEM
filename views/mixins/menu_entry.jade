@@ -1,0 +1,22 @@
+//- Provides mixins for menu entries in primary and secondary navs.
+
+
+//- name: the visible name for the entry
+//- url: the url the entry points to
+//- activeIf: a value
+mixin menuEntry(name, url, activeIf)
+  if req.url.search(activeIf) >= 0
+    li.active: a(href=url)= name
+  else
+    li: a(href=url)= name
+    
+mixin menuEntryWithBullet(name, url, activeIf, bullet)
+  if req.url.search(activeIf) >= 0
+    li.active: a(href=url)
+      = name
+      span.badge.pull-right= bullet
+  else
+    li: a(href=url)
+      = name
+      span.badge.pull-right= bullet
+      

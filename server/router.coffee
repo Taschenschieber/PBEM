@@ -24,11 +24,14 @@ error = (err,req,res,next) -> res.send("ERROR: ", err, "STACKTRACE: ", err.stack
 error404 = (req,res,next) -> res.status(404).render "404.jade", {req:req,res:res}
   
 app.configure () ->
+
+  # settings
+  app.set "view engine", "jade"
+  app.locals.pretty = true # serve readable html files
+
+  
   # static files go first
   app.use express.static "./pub"
-  
-  # middleware settings
-  app.locals.pretty = true # serve readable html files
   
   # middleware that does not require authentication
   app.use express.cookieParser()
