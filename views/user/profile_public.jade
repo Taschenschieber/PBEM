@@ -32,10 +32,9 @@ block content
           | )
         td
           if user.rating.games <= 10
-            span(style="color:grey;")
-              | (
-              =user.rating.points
-              | )
+            | (
+            span(class="provisional-rating")= user.rating.points
+            | )
           else
             span= user.rating.points
         

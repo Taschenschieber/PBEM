@@ -8,7 +8,7 @@ mixin ratingLine(user, i)
     td
       if user.rating.games < 10
         | (
-        span(style='color:red')= user.rating.points
+        span(class="provisional-rating")= user.rating.points
         | )
       else
         = user.rating.points

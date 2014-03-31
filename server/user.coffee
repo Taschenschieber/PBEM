@@ -131,3 +131,23 @@ exports.setupRoutes = (app) ->
       
       res.render "user/best.jade", data
         
+  app.get "/users/find", auth.loggedIn, (req, res) ->
+    data = {req:req, res:res}
+    database.User
+      .find {}
+      .sort "+name"
+      .select "name activated banned rating"
+      .exec (err, users) ->
+        return error.handle err if err
+        data.users = users
+        
+        # NOTE: Some performance improvement is possible here by generating
+        # gravatar URLS here directly and passing them to the view. So far,
+        # the view will use the /user/<name>/avatar/32 route, which leads to
+        # a new DB query for every single user.
+        # 
+        # For the sake of possible changes to the avatar system in the future,
+        # we'll use the less performant alternative for the time being.
+        res.render "user/find.jade", data
+        
+        

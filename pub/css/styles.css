@@ -52,3 +52,8 @@ table.own-profile td, table.own-profile th {
   font-size: 8pt;
   color: light-grey;
 }
+
+.provisional-rating {
+  color: grey;
+  font-style: italic;
+}

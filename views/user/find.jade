@@ -1,0 +1,34 @@
+extend ../layout
+
+mixin showUser(user)
+  tr
+    td(width="32px"): img(src="/user/"+user.name+"/avatar/32")
+    td: a(href="/user/"+user.name)= user.name
+    td
+      if user.banned
+        span.banned Banned
+      else if !user.activated
+        span.banned Not activated
+      else
+        span.regular-user User
+    td
+      if user.rating.games <= 10
+        | (
+        span(class="provisional-rating")= user.rating.points
+        | )
+      else
+        = user.rating.points
+        
+
+block secondary-nav
+  include secondary-nav-users
+
+block content
+  h1 User Directory
+  table.table
+    tr
+      th(colspan=2) Name
+      th Status
+      th Rating
+    each user in users
+      +showUser(user)
