@@ -51,7 +51,7 @@ mixin incoming(challengers)
               td(colspan=2)= ch.message
 
 mixin outgoing(challenges)
-  each ch in challengers
+  each ch in challenges
     .panel.panel-default
       .panel-heading
         h3.panel-title
@@ -64,7 +64,7 @@ mixin outgoing(challenges)
           tr
             td(colspan=2)           
               | Challenge to 
-              = ch.from
+              = ch.to
               | ,&nbsp;
               = " "+ch.fancyDate || ch.sent
           tr

@@ -4,6 +4,12 @@
 # are mostly inconsistent, which is due to change sometime soon.
 #
 # Routes defined in this file: 
+# /challenges/send
+# /challenges/send/do - POST
+# /challenges/list
+# /challenge/<id>/takeback
+# /challenge/<id>/accept
+# /challenge/<id>/decline
 
 mkdirp = require "mkdirp"
 fs = require "fs"
@@ -28,13 +34,13 @@ exports.setupRoutes = (app) ->
       to: req.user.name
     .populate "scenario"
     .exec (err, challengers) ->
-      return error.handle err if err
+      return error.handle err, req, res if err
       data.challengers = challengers || []
       database.Challenge.find
         from: req.user.name
       .populate "scenario"
       .exec (err, challenges) ->
-        return error.handle err if err
+        return error.handle err, req, res if err
         data.challenges = challenges || []
 
         # create fancy dates        
@@ -91,7 +97,7 @@ exports.setupRoutes = (app) ->
         action: "/games/my/challenges"
         image: "/user/"+challenge.from+"/avatar/32" #32px big avatar
       notification.save (err) ->
-        console.log(err || "Notification created")
+        console.log(err?.trace || "Notification created")
         # all done... hopefully. Worry about asynchronous err handling later.
         # no error handling for notifications, it's not really worth it.
       res.redirect("/challenges/list#out")
