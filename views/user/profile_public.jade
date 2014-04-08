@@ -37,6 +37,31 @@ block content
             | )
           else
             span= user.rating.points
+            
+    h1 Other profiles
+    - var count = 0
+    if (user. profile && (user.profile.thegeek || user.profile.facebook || user.profile.gplus || user.profile.twitter || user.profile.xmpp))
+      table
+        if user.profile.thegeek
+          tr
+            th BoardGameGeek
+            td: a(href="http://boardgamegeek.com/user/"+user.profile.thegeek)= user.profile.thegeek
+        if user.profile.facebook
+          tr
+            th Facebook
+            td: a(href="http://facebook.com/"+user.profile.facebook)= user.profile.facebook
+        if user.profile.gplus
+          tr
+            th Google+
+            td: a(href="http://plus.google.com/"+user.profile.gplus) User page
+        if user.profile.xmpp
+          tr
+            th Jabber / XMPP
+            td: a(href="xmpp:"+user.profile.xmpp) user.profile.xmpp
+        if user.profile.twitter
+          tr
+            th Twitter
+            td: a(href="http://twitter.com/"+user.profile.twitter)= user.profile.twitter
         
 
     //- TODO Add admin etc status
