@@ -19,6 +19,7 @@ ZIP = require "adm-zip" # NOTE: Does not currently work with official version
 avatar = require "../avatar"
 auth = require "../auth"
 common = require "../common"
+config = require "../config"
 database = require "../database"
 email = require "../email"
 error = require "../error"
@@ -31,8 +32,13 @@ exports.setupRoutes = (app) ->
     else
       res.redirect "/games/all/active"
   
-  app.get "/games/:name/:state", (req,res) ->
+  app.get "/games/:name/:state", (req, res) ->
+    res.redirect "/games/#{req.params.name}/#{req.params.state}/1"
+  
+  app.get "/games/:name/:state/:page", (req,res) ->
     data = assembleData req, res
+    ipp = config.design.itemsPerPage
+    start = (req.params.page-1)*ipp
     query = {}
     
     if req.params.name == "me"
@@ -53,16 +59,22 @@ exports.setupRoutes = (app) ->
       query["result"] = "ongoing"
       data.state = "active"
 
-    console.log query
     database.Game.find query
     .populate "scenario"
     .select "_id playerA playerB scenario activePlayer whoIsAttacker whoseTurn result"
+    .sort "-started" # todo sort by end date when looking at archived games
+    .skip start
+    .limit ipp
     .exec (err, games) ->
-      console.log games
       res.send err if (err)
       
       data.games = games
-      res.render "games/list.jade", data    
+      data.page = parseInt req.params.page
+      data.pagesDisplayed = config.design.pagesDisplayed
+      data.pagesBaseLink =  "/games/#{req.params.name}/#{req.params.state}/"
+      database.Game.count query, (err, count) ->
+        data.pages = Math.floor(count / ipp)+1
+        res.render "games/list.jade", data    
   
   
   app.get "/game/:id", (req,res) ->

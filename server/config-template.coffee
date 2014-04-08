@@ -21,3 +21,7 @@ exports.session =
 
 # Set this to "no" for production.  
 exports.debug = yes
+
+exports.design = 
+  itemsPerPage = ipp = 20
+  pagesDisplayed = 2

@@ -18,6 +18,22 @@ mixin list(games)
           td Custom Scenario
         td: a(href="/game/"+game.id) Show Details
         
+mixin pagination()
+  if pages > 1
+    ul.pagination
+      li: a(href=pagesBaseLink+"1") &larr; First
+      - for(var i = page-pagesDisplayed; i < page+pagesDisplayed+1; i++)
+        if i < pages && i > 0
+          if i == page
+            li.active: a(href="#")= i
+          else
+            li: a(href=pagesBaseLink+""+i)= i
+      li
+        if page >= pages-1
+          a(href="#") &raquo;
+        else
+          a(href=pagesBaseLink+""+(pages-1)) Last &rarr;
+        
 mixin tname(n)
   if n == req.user.name
     strong You
@@ -37,7 +53,11 @@ block content
   else
     h1 #{+tname(name)}'s #{state} games
     
+  +pagination()
+    
   if games && games.length > 0
     +list(games)
   else
     p No games match the criteria.
+    
+  +pagination()
