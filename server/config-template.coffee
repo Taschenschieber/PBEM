@@ -18,3 +18,6 @@ exports.server =
 # The secret for encrypting sessions. Should never be empty in production.  
 exports.session = 
   secret: ""
+
+# Set this to "no" for production.  
+exports.debug = yes

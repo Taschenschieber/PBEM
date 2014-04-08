@@ -12,6 +12,7 @@ challenge = require "./games/challenge"
 common = require "./common"
 config = require "./config"
 database = require "./database"
+debug = require "./debug"
 error = require "./error"
 game = require "./games/game"
 notifications = require "./notification-loader"
@@ -81,7 +82,8 @@ challenge.setupRoutes app
 user.setupRoutes app
 notifications.setupRoutes app
 ajax.setupRoutes app
-avatar.setupRoutes app
+avatar.setupRoutes app # no effect in production
+debug.setupRoutes app
 
 app.listen(8080)
 console.log "Server listening at 8080"

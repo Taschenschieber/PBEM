@@ -48,8 +48,6 @@ game = new mongoose.Schema
   scenario: 
     type: String 
     ref: "Scenario"
-  active:
-    type: Boolean, default: true # set to false once completed / aborted
   result:
     type: String
     default: "ongoing"

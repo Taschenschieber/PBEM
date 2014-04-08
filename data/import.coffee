@@ -1,6 +1,6 @@
 csv = require "csv"
 fs = require "fs"
-database = require "../database"
+database = require "../server/database"
 Scenario = database.Scenario
 
 Scenario.remove()

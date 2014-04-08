@@ -40,20 +40,6 @@ scenario = new mongoose.Schema
       
 exports.Scenario = Scenario = mongoose.model "Scenario", scenario
 
-# create an initial entry for debugging purposes if table is empty
-Scenario.count {}, (err, result) ->
-  console.log result, " scenarios in database"
-  if result == 0
-    new Scenario
-      number: "A"
-      title: "The Guards Counterattack"
-      attacker:
-        nation: "USSR"
-      defender:
-        nation: "Germany"
-    .save (err) ->
-      console.log err.message
-
 exports.Game = gameLogic.Game
 exports.Log = gameLogic.Log
 
@@ -95,7 +81,8 @@ exports.Notification = Notification = mongoose.model "Notification", notificatio
 userSchema = new mongoose.Schema
   name: 
     type: String
-    index: true
+    index:
+      unique: true
   password: String
   email: String
   validationToken: 
