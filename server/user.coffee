@@ -121,7 +121,7 @@ exports.setupRoutes = (app) ->
     data = {req: req, res: res}
     database.User
     .find {}
-    .sort "-rating"
+    .sort "-rating.points"
     .limit 10
     .select "name rating password" # NOTE not selecting password causes error
     .exec (err, bestRatings) ->
