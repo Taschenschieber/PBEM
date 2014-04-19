@@ -95,31 +95,27 @@ block content
         td
         td
         
-        
-  if game.logs.length == 0
-    p 
-      | This game has no logs so far. 
-      if ownGame
-      a(href="/game/"+game._id+"/upload") Upload a log to start the game!
-  
-  else
-    if req && req.user
-      h4 Actions
-      p
+  if (req && req.user)
+    h4 Actions
+    p
+      if game.logs.length > 0
         a.btn.btn-info.active(href="/logfiles/"+game._id+"/"+game.logs[game.logs.length -1]._id+".vlog") Download latest log
         | &nbsp;
-        a.btn.btn-info.active(href="/game/"+game._id+"/"+bulkName+".zip") Download game
+      a.btn.btn-info.active(href="/game/"+game._id+"/"+bulkName+".zip") Download game
+      | &nbsp;
+      if game.result == "ongoing" && ownGame
+        a.btn.btn-primary.btn-large.active(href="/game/"+game._id+"/upload", role="button") Upload log 
         | &nbsp;
-        if game.result == "ongoing" && ownGame
-          a.btn.btn-primary.btn-large.active(href="/game/"+game._id+"/upload", role="button") Upload log 
-          | &nbsp;
-          a.btn.btn-danger.btn-large.active(href="/game/"+game._id+"/resign", role="button") Resign
-        else if game.result == "ongoing"
-          if !(game.kibitzers.indexOf(req.user.id) >= 0)
-            a.btn.btn-info.active(href="/game/"+game._id+"/kibitz", role="button") Watch
-          else
-            a.btn.btn-info.active(href="/game/"+game._id+"/unkibitz", role="button") Stop watching
+        a.btn.btn-danger.btn-large.active(href="/game/"+game._id+"/resign", role="button") Resign
+      else if game.result == "ongoing"
+        if !(game.kibitzers.indexOf(req.user.id) >= 0)
+          a.btn.btn-info.active(href="/game/"+game._id+"/kibitz", role="button") Watch
+        else
+          a.btn.btn-info.active(href="/game/"+game._id+"/unkibitz", role="button") Stop watching
           
-    h4 Logs      
+  h4 Logs
+  if game.logs.length > 0
     +logs(game)
+  else
+    p This game has no logs so far.
     
